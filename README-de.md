@@ -8,8 +8,7 @@ Netzwerken mit leicht verfügbarer Hardware. Er kann auch bei sehr hohen Latenzz
 und extrem geringer Bandbreite arbeiten. Mit Reticulum können Sie Wide-Area-Netzwerke aufbauen
 Reticulum ermöglicht den Aufbau von Weitverkehrsnetzen mit handelsüblichen Tools und bietet End-to-End-Verschlüsselung und Konnektivität,
 Anonymität des Initiators, autokonfigurierende kryptografisch unterstützter
-Multi-Hop-Transport, effiziente Adressierung, fälschungssichere Zustellbestätigungen und
-mehr.
+Multi-Hop-Transport, effiziente Adressierung, fälschungssichere Zustellbestätigungen und mehr.
 
 
 Die Vision von Reticulum ist es, jedem die Möglichkeit zu geben, sein eigener Netzbetreiber zu sein,
@@ -27,7 +26,7 @@ Daher ist es trivial, Reticulum über das Internet oder private IP
 Netze zu tunneln.
 
 Da keine Abhängigkeiten von traditionellen Netzwerkstapeln bestehen, entfällt der Overhead,
-der für die Implementierung eines direkt auf kryptografischen Grundsätzen basierenden Netzwerkstacks verwendet wurde, 
+da für die Implementierung ein direkt auf kryptografische Grundsätze basierender Netzwerkstack erstellt wurde, 
 und ermöglicht Ausfallsicherheit und stabile Funktionalität, selbst in offenen
 vertrauenslosen Netzwerken.
 
@@ -69,15 +68,14 @@ Wenn Sie sich schnell einen Überblick über die Möglichkeiten von Reticulum ve
 folgenden Ressourcen.
 
 - Eine netzunabhängige, verschlüsselte und widerstandsfähige Mesh-Kommunikationsplattform finden Sie unter [Nomad Network](https://github.com/markqvist/NomadNet)
-- Die Android-, Linux- und macOS-Anwendung [Sideband] (https://github.com/markqvist/Sideband) verfügt über eine grafische Oberfläche und legt den Schwerpunkt auf Benutzerfreundlichkeit.
+- Die Android-, Linux- und macOS-Anwendung [Sideband](https://github.com/markqvist/Sideband) verfügt über eine grafische Oberfläche und legt den Schwerpunkt auf Benutzerfreundlichkeit.
 - [LXMF](https://github.com/markqvist/lxmf) ist ein verteiltes, verzögerungs- und unterbrechungstolerantes Nachrichtenübertragungsprotokoll, das auf Reticulum aufbaut.
 
 ## Wo kann Reticulum eingesetzt werden?
 Über praktisch jedes Medium, das mindestens einen Halbduplex-Kanal unterstützen kann
 mit einem Durchsatz von 500 Bit pro Sekunde und einer MTU von 500 Byte. Datenfunkgeräte,
 Modems, LoRa-Funkgeräte, serielle Leitungen, AX.25 TNCs, digitale Amateurfunkmodi,
-WiFi- und Ethernet-Geräte, optische Verbindungen im freien Raum und ähnliche Systeme sind
-sind alles Beispiele für physikalische Geräte, die Reticulum verwenden kann.
+WiFi- und Ethernet-Geräte, optische Verbindungen im freien Raum und ähnliche Systeme sind alles Beispiele für physikalische Geräte, die Reticulum verwenden kann.
 
 Eine Open-Source-Schnittstelle auf LoRa-Basis namens
 [RNode](https://markqvist.github.io/Reticulum/manual/hardware.html#rnode) 
@@ -95,8 +93,7 @@ konfiguriert sind, kümmert sich Reticulum um den Rest, und jedes Gerät im WiFi
 Netzwerk des Gateway Knotens kann mit der LoRa- und Paketfunkseite des Netzwerks kommunizieren und umgekehrt.
 
 ## Wie fange ich an?
-Wie Sie am besten mit dem Reticulum Network Stack beginnen, hängt davon ab, was Sie
-Sie tun möchten. Ausführliche Details und Beispiele finden Sie im Abschnitt 
+Wie Sie am besten mit dem Reticulum Network Stack beginnen, hängt davon ab, was Sie tun möchten. Ausführliche Details und Beispiele finden Sie im Abschnitt 
 [Schnelleinstieg](https://markqvist.github.io/Reticulum/manual/gettingstartedfast.html) 
 im [Reticulum Manual](https://markqvist.github.io/Reticulum/manual/).
 
