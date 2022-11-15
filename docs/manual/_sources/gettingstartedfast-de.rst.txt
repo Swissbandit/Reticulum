@@ -2,8 +2,8 @@
 Schneller Einstieg
 ********************
 
-Wie Sie am besten mit dem Reticulum Network Stack beginnen, hängt davon ab, was Sie
-Sie tun möchten. Dieser Leitfaden skizziert sinnvolle Einstiegswege für verschiedene
+Wie Sie am besten mit dem Reticulum Netzwerk Stack beginnen, hängt davon ab, was Sie
+tun möchten. Dieser Leitfaden skizziert sinnvolle Einstiegswege für verschiedene
 Szenarien.
 
 
@@ -15,11 +15,11 @@ Programme, die eine grundlegende Kommunikation und eine Reihe anderer nützliche
 auch über Reticulum-Netzwerke mit extrem geringer Bandbreite ermöglichen.
 
 Mit diesen Programmen können Sie ein Gefühl dafür bekommen, wie Reticulum funktioniert. Sie wurden entwickelt
-LoRa- oder Packet-Radio-Netzwerken zu arbeiten, können aber auch vollständig über
-über lokales WiFi, kabelgebundenes Ethernet, das Internet oder eine beliebige Kombination.
+um mit LoRa- oder Packet-Radio-Netzwerken zu arbeiten, können aber auch vollständig über
+lokales WiFi oder kabelgebundenes Ethernet, das Internet oder eine beliebige Kombinationen daraus nutzen.
 
 So ist es einfach, mit dem Experimentieren zu beginnen, ohne dass man irgendwelche Funkgeräte oder
-Transceiver oder eine Infrastruktur aufzubauen, nur um es auszuprobieren. Das Starten der Programme auf separaten
+Transceiver oder eine Infrastruktur aufbauen müsste, nur um es auszuprobieren. Das Starten der Programme auf separaten
 Geräten, die mit demselben WiFi-Netzwerk verbunden sind, reicht für den Anfang aus.
 Funkschnittstellen können dann später hinzugefügt werden.
 
@@ -43,23 +43,22 @@ Sie können Nomad Network installieren über pip:
 
 .. code::
 
-   # Install ...
+   # Installieren ...
    pip3 install nomadnet
 
-   # ... and run
+   # ... und starten
    nomadnet
 
-**Bitte beachten Sie**: Wenn Sie pip zum ersten Mal verwenden, um ein Programm auf Ihrem System zu installieren
-auf Ihrem System verwenden, müssen Sie Ihr System möglicherweise neu starten, damit Ihr Programm
-verfügbar ist. Wenn Sie beim Ausführen des Programms die Fehlermeldung "command not found" oder eine ähnliche Meldung erhalten
-Programms erhalten, starten Sie Ihr System neu und versuchen Sie es erneut.
+**Bitte beachten Sie**: Wenn Sie pip zum ersten Mal verwenden, um ein Programm auf Ihrem System zu installieren, 
+müssen Sie Ihr System möglicherweise neu starten, damit Ihr Programm
+verfügbar ist. Wenn Sie beim Ausführen des Programms die Fehlermeldung "command not found" oder eine ähnliche Meldung erhalten, 
+starten Sie Ihr System neu und versuchen Sie es erneut.
 
 Sideband
 ^^^^^^^^
 
 Wenn Sie lieber ein Programm mit einer grafischen Benutzeroberfläche verwenden möchten, können Sie sich
-Sideband <https://unsigned.io/sideband>`_ ansehen, das für Android, Linux und macOS verfügbar ist,
-Linux und macOS verfügbar ist.
+Sideband <https://unsigned.io/sideband>`_ ansehen, das für Android, Linux und macOS verfügbar ist.
 
 .. image:: screenshots/sideband_1.png
     :align: center
@@ -70,23 +69,23 @@ Kommunikationsfunktionen und interagiert mit Nomad Network oder jedem anderen LX
 
 Verwendung der mitgelieferten Dienstprogramme
 =============================================
-Reticulum wird mit einer Reihe von Dienstprogrammen ausgeliefert, die die
-die Verwaltung Ihres Netzwerks, die Überprüfung der Konnektivität und die Bereitstellung von Reticulum für andere
-Programme auf Ihrem System verfügbar machen.
+Reticulum wird mit einer Reihe von Dienstprogrammen ausgeliefert, welche
+die Verwaltung Ihres Netzwerks, die Überprüfung der Konnektivität und die Bereitstellung 
+von Reticulum für andere Programme auf Ihrem System verfügbar machen.
 
 Sie können ``rnsd`` verwenden, um Reticulum als Hintergrund- oder Vordergrunddienst laufen zu lassen,
 und die Dienstprogramme ``rnstatus``, ``rnpath`` und ``rnprobe`` zum Anzeigen und Abfragen von
-Netzwerkstatus und -konnektivität abzufragen.
+Netzwerkstatus und -konnektivität aufrufen.
 
-Um mehr über diese Hilfsprogramme zu erfahren, schauen Sie sich das Kapitel
+Um mehr über diese Hilfsdienstprogramme zu erfahren, schauen Sie sich das Kapitel
 :ref:`Benutzung von Reticulum auf Ihrem System<using-main>` dieses Handbuchs.
 
 
 Erstellen eines Netzwerks mit Reticulum
 =============================================
 Um ein Netzwerk zu erstellen, müssen Sie eine oder mehrere *Schnittstellen* angeben, die
-Reticulum verwenden soll. Dies geschieht in der Konfigurationsdatei von Reticulum, die standardmäßig
-die sich standardmäßig unter ``~/.reticulum/config`` befindet. Sie können diese Datei von Hand bearbeiten,
+Reticulum verwenden soll. Dies geschieht in der Konfigurationsdatei von Reticulum, welche sich
+unter ``~/.reticulum/config`` befindet. Sie können diese Datei von Hand bearbeiten,
 oder das interaktive Dienstprogramm ``rnsconfig`` verwenden. 
 
 Wenn Reticulum zum ersten Mal gestartet wird, erstellt es eine Standard
@@ -99,35 +98,34 @@ Konfiguration enthält eine Reihe von Beispielen, die von der Verwendung von TCP
 Internet, bis hin zu LoRa- und Packet-Radio-Schnittstellen.
 
 Mit Reticulum müssen Sie nur die Schnittstellen konfigurieren, über die Sie kommunizieren möchten.
-über die Sie kommunizieren möchten. Sie müssen keine Adressräume, Subnetze, Routing-Tabellen
-oder andere Dinge, die Sie vielleicht von anderen Netzwerktypen gewohnt sind.
+Sie müssen keine Adressräume, Subnetze, Routing-Tabellen
+oder andere Dinge, die Sie vielleicht von anderen Netzwerktypen gewohnt sind eingeben.
 
 Sobald Reticulum weiß, welche Schnittstellen es verwenden soll, wird es automatisch
-Topographie und konfiguriert den Datentransport zu allen ihm bekannten Zielen
-Ziele, die es kennt.
+Topographie erkennen und konfiguriert den Datentransport zu allen ihm bekannten Zielen, die es kennt.
 
 In Situationen, in denen Sie bereits über ein etabliertes WiFi- oder Ethernet-Netzwerk verfügen, und
-viele Geräte, die dieselben externen Reticulum-Netzwerkpfade nutzen möchten (z. B. über
-LoRa), reicht es oft aus, ein System als Reticulum-Gateway zu verwenden, indem
-ein System als Reticulum-Gateway fungiert, indem es alle externen Schnittstellen zur Konfiguration dieses Systems hinzufügt und dann den Transport auf diesem System aktiviert. Jedes
+viele Geräte, die dieselben externen Reticulum-Netzwerkpfad nutzen möchten (z. B. über
+LoRa), reicht es oft aus, ein System als Reticulum-Gateway zu verwenden,
+indem es alle externen Schnittstellen zur Konfiguration dieses Systems hinzufügt und dann den Transport auf diesem System aktiviert.
 Jedes andere Gerät in Ihrem lokalen WiFi kann sich dann mit diesem größeren Reticulum
-Netzwerk zu verbinden, indem es einfach die Standardkonfiguration (:ref:`AutoInterface<interfaces-auto>`) verwendet.
+Netzwerk verbinden, indem es einfach die Standardkonfiguration (:ref:`AutoInterface<interfaces-auto>`) verwendet.
 
 Möglicherweise reichen die Beispiele in der Konfigurationsdatei für den Anfang aus. Wenn
 Sie mehr Informationen wünschen, können Sie die Kapitel :ref:`Building Networks<networks-main>`
-und :ref:`Schnittstellen<Schnittstellen-Haupt>` in diesem Handbuch lesen.
+und :ref:`Schnittstellen<interfaces-main>` in diesem Handbuch lesen.
 
 Verbinden von Reticulum-Instanzen über das Internet
 ================================================
 Reticulum bietet derzeit zwei Schnittstellen für die Verbindung von Instanzen über das Internet an: :ref:`TCP<interfaces-tcps>`
-und :ref:`I2P<Schnittstellen-i2p>`. Jede Schnittstelle bietet einen anderen Funktionsumfang, und Reticulum 
+und :ref:`I2P<interfaces-i2p>`. Jede Schnittstelle bietet einen anderen Funktionsumfang, und Reticulum 
 Benutzer sollten sorgfältig die Schnittstelle auswählen, die ihren Bedürfnissen am besten entspricht. 
 
 Das ``TCPServerInterface`` ermöglicht es Benutzern, eine Instanz zu hosten, die über TCP/IP zugänglich ist. Diese
 Methode ist im Allgemeinen schneller, hat eine geringere Latenz und ist energieeffizienter als die Verwendung von ``I2PInterface``,
 Allerdings werden dabei auch mehr Daten über den Server-Host preisgegeben.
 
-Bei TCP-Verbindungen wird die IP-Adresse sowohl Ihrer Instanz als auch des Servers für jeden sichtbar, der
+Bei TCP-Verbindungen wird die IP-Adresse sowohl Ihrer Instanz als auch des Servers für jeden sichtbar,
 der die Verbindung inspiziert. Jemand könnte diese Informationen nutzen, um Ihren Standort oder Ihre Identität zu ermitteln. Angreifer 
 die Ihre Pakete inspizieren, können möglicherweise Metadaten der Pakete aufzeichnen, wie z. B. den Zeitpunkt der Übertragung und die Größe der Pakete.
 Obwohl Reticulum den Datenverkehr verschlüsselt, ist dies bei TCP nicht der Fall, so dass ein Angreifer mithilfe der
@@ -137,7 +135,7 @@ die die meisten Internetverbindungen nicht mehr bieten.
 
 Das ``I2PInterface`` leitet Nachrichten über das `Invisible Internet Protocol 
 (I2P) <https://geti2p.net/en/>`_. Um diese Schnittstelle zu benutzen, müssen Benutzer auch einen I2P-Daemon
-parallel zu ``rnsd`` laufen. Für immer aktive I2P-Knoten wird empfohlen, `i2pd <https://i2pd.website/>`_ zu verwenden. 
+parallel zu ``rnsd`` laufen haben. Für immer aktive I2P-Knoten wird empfohlen, `i2pd <https://i2pd.website/>`_ zu verwenden. 
 
 Standardmäßig verschlüsselt und mischt I2P den gesamten über das Internet gesendeten Datenverkehr und 
 und verbirgt sowohl die IP-Adressen der Sender- als auch der Empfängerinstanz von Reticulum. Der Betrieb eines I2P-Knotens 
@@ -156,7 +154,7 @@ Anschluss an das öffentliche Testnetz
 ===========================================
 
 Ein experimentelles öffentliches Testnetz wurde sowohl über I2P als auch über TCP zugänglich gemacht. Sie können diesem Netz beitreten
-teilnehmen, indem Sie eine der folgenden Schnittstellen zu Ihrer ``.reticulum/config``-Datei hinzufügen:
+und daran teilnehmen, indem Sie eine der folgenden Schnittstellen zu Ihrer ``.reticulum/config``-Datei hinzufügen:
 
 .. code::
 
@@ -181,27 +179,27 @@ teilnehmen, indem Sie eine der folgenden Schnittstellen zu Ihrer ``.reticulum/co
     peers = uxg5kubabakh3jtnvsipingbr5574dle7bubvip7llfvwx2tgrua.b32.i2p
 
 Viele andere Reticulum-Instanzen sind mit diesem Testnetz verbunden, und Sie können sich auch
-über andere Zugangspunkte, wenn Sie diese kennen. Es gibt keinerlei Kontrolle über das Netzwerk
-Topographie, Nutzung oder welche Arten von Instanzen sich verbinden. Gelegentlich wird es auch benutzt
+über andere Zugangspunkte anbinden, wenn Sie diese kennen. Es gibt keinerlei Kontrolle über das Netzwerk
+die Topographie, Nutzung oder welche Arten von Instanzen sich verbinden. Gelegentlich wird es auch benutzt
 um verschiedene Ausfallszenarien zu testen, und es gibt keine Verfügbarkeits- oder Servicegarantien.
 
 
 Hinzufügen von Funkschnittstellen
 ==============================================
 Sobald Sie Reticulum installiert haben und es funktioniert, können Sie Funkschnittstellen mit
-mit jeder kompatiblen Hardware, die Sie zur Verfügung haben. Reticulum unterstützt eine breite Palette von Funkgeräten
-Wenn Sie bereits über Funkgeräte verfügen, ist es sehr wahrscheinlich, dass diese mit Reticulum
-mit Reticulum funktionieren. Informationen zur Konfiguration finden Sie im Abschnitt
-:ref:`Schnittstellen<Schnittstellen-Hauptteil>` in diesem Handbuch.
+jeder kompatiblen Hardware, die Sie zur Verfügung haben nutzen. Reticulum unterstützt 
+eine breite Palette von Funkgeräten. Wenn Sie bereits über Funkgeräte verfügen, ist es sehr wahrscheinlich, 
+dass diese mit Reticulum funktionieren. Informationen zur Konfiguration finden Sie im Abschnitt
+:ref:`Schnittstellen<interfaces-main>` in diesem Handbuch.
 
-Wenn Sie noch keine Transceiver-Hardware zur Verfügung haben, können Sie einfach und
+Wenn Sie noch keine Transceiver-Hardware zur Verfügung haben, können Sie auch einfach
 einen :ref:`RNode<rnode-main>` bauen, einen Allzweck-Digitalfunkempfänger mit großer Reichweite
 Langstrecken-Digitalfunkgerät, das sich leicht in Reticulum integrieren lässt.
 
-Um eine solche selbst zu erstellen, muss eine benutzerdefinierte Firmware auf einer unterstützten LoRa
-Entwicklungsboard mit einem Auto-Installations-Skript. Bitte lesen Sie das :ref:`Kommunikationshardware<hardware-main>`
+Um einen solchen selbst zu erstellen, muss eine benutzerdefinierte Firmware auf einem unterstützten LoRa
+Entwicklungsboard mit einem Auto-Installations-Skript erstellt werden. Bitte lesen Sie das :ref:`Kommunikationshardware<hardware-main>`
 Kapitel für eine Anleitung. Wenn Sie es vorziehen, eine fertige Einheit zu kaufen, können Sie sich auf die
-:ref:`Liste der Anbieter<rnode-Lieferanten>`. Für weitere Informationen über RNode können Sie auch
+:ref:`Liste der Anbieter<rnode-suppliers>`. Für weitere Informationen über RNode
 können Sie auch auf diese zusätzlichen externen Ressourcen zurückgreifen:
 
 * `Wie Sie Ihre eigenen RNodes herstellen <https://unsigned.io/how-to-make-your-own-rnodes/>`_
@@ -212,21 +210,21 @@ können Sie auch auf diese zusätzlichen externen Ressourcen zurückgreifen:
 Wenn Sie über Kommunikationshardware verfügen, die noch nicht von einem der
 :ref:`vorhandenen Schnittstellentypen<interfaces-main>` unterstützt wird, aber Ihrer Meinung nach für die Verwendung mit Reticulum geeignet wäre,
 können Sie sich gerne auf den `GitHub Diskussionsseiten <https://github.com/markqvist/Reticulum/discussions>`_
-und vorschlagen, eine Schnittstelle für die Hardware hinzuzufügen.
+melden und vorschlagen, eine Schnittstelle für die Hardware hinzuzufügen.
 
 
 Entwickeln Sie ein Programm mit Reticulum
 ===========================================
-Wenn Sie Programme entwickeln möchten, die Reticulum verwenden, ist der einfachste Weg, mit der
-ist es, die neueste Version von Reticulum über pip zu installieren:
+Wenn Sie Programme entwickeln möchten, die Reticulum verwenden, ist der einfachste Weg, 
+die neueste Version von Reticulum über pip zu installieren:
 
 .. code::
 
    pip3 install rns
 
 Mit dem obigen Befehl werden Reticulum und die Abhängigkeiten installiert, und Sie sind
-bereit, RNS zu importieren und in Ihren eigenen Programmen zu verwenden. Der nächste Schritt wird höchstwahrscheinlich
-wahrscheinlich sein, sich einige :ref:`Beispielprogramme<examples-main>` anzusehen.
+bereit, RNS zu importieren und in Ihren eigenen Programmen zu verwenden. Der nächste Schritt wird 
+höchstwahrscheinlich sein, sich einige :ref:`Beispielprogramme<examples-main>` anzusehen.
 
 Um die Funktionalität zu erweitern, können Sie optionale Abhängigkeiten installieren:
 
@@ -240,45 +238,45 @@ Weitere Informationen finden Sie in der :ref:`API-Referenz<api-main>`.
 
 An der Entwicklung von Reticulum mithelfen
 ==============================================
-Wenn Sie sich an der Entwicklung von Reticulum und den zugehörigen
-teilnehmen möchten, sollten Sie sich den aktuellen Quellcode von GitHub besorgen. In diesem Fall
+Wenn Sie sich an der Entwicklung von Reticulum und den zugehörigen teilen
+einbringen möchten, sollten Sie sich den aktuellen Quellcode von GitHub besorgen. In diesem Fall
 verwenden Sie nicht pip, sondern versuchen Sie dieses Rezept:
 
 .. code::
 
-    # Install dependencies
+    # Installieren der Abhängigkeiten
     pip3 install cryptography pyserial netifaces
 
-    # Clone repository
+    # Repositorium klonen
     git clone https://github.com/markqvist/Reticulum.git
 
-    # Move into Reticulum folder and symlink library to examples folder
+    # In den Ordner Reticulum verschieben und die Bibliothek mit dem Ordner examples verknüpfen
     cd Reticulum
     ln -s ../RNS ./Examples/
 
-    # Run an example
+    # Ein Beispiel ausführen
     python3 Examples/Echo.py -s
 
-    # Unless you've manually created a config file, Reticulum will do so now,
-    # and immediately exit. Make any necessary changes to the file:
+    # Sofern Sie nicht manuell eine Konfigurationsdatei erstellt haben, wird Reticulum dies jetzt tun,
+    # und sofort beenden. Nehmen Sie alle erforderlichen Änderungen an der Datei vor:
     nano ~/.reticulum/config
 
-    # ... and launch the example again.
+    # ... und starten Sie das Beispiel erneut.
     python3 Examples/Echo.py -s
 
-    # You can now repeat the process on another computer,
-    # and run the same example with -h to get command line options.
+    # Sie können den Vorgang nun auf einem anderen Computer wiederholen,
+    # und führen Sie das gleiche Beispiel mit -h aus, um Befehlszeilenoptionen zu erhalten.
     python3 Examples/Echo.py -h
 
-    # Run the example in client mode to "ping" the server.
-    # Replace the hash below with the actual destination hash of your server.
+    # Führen Sie das Beispiel im Client-Modus aus, um den Server "anzupingen".
+    # Ersetzen Sie den unten stehenden Hash durch den tatsächlichen Ziel-Hash Ihres Servers.
     python3 Examples/Echo.py 3e12fc71692f8ec47bc5
 
-    # Have a look at another example
+    # Sehen Sie sich ein weiteres Beispiel an
     python3 Examples/Filetransfer.py -h
 
 Wenn Sie mit den grundlegenden Beispielen experimentiert haben, ist es an der Zeit, das folgende Kapitel zu lesen
-:ref:`Verständnis des Retikulums<Verständnis-Haupt>` zu lesen. Bevor Sie einen
+:ref:`Reticulum verstehen<understanding-main>`. Bevor Sie einen
 Pull-Request einreichen, ist es wahrscheinlich eine gute Idee, sich im
 Forum auf GitHub <https://github.com/markqvist/Reticulum/discussions>`_ vorzustellen,
 oder einen der Entwickler oder Betreuer zu fragen, wo man am besten anfängt.
@@ -288,32 +286,32 @@ Reticulum auf ARM64
 ==============================================
 Auf einigen Architekturen, einschließlich ARM64, haben nicht alle Abhängigkeiten vorkompilierte
 Binärdateien. Auf solchen Systemen müssen Sie ``python3-dev`` installieren, bevor Sie
-vor der Installation von Reticulum oder von Programmen, die von Reticulum abhängen.
+mit der Installation von Reticulum oder von Programmen, die von Reticulum abhängen beginnen können.
 
 .. code::
 
-   # Install Python and development packages
+   # Installliere Python und Entwickler Packete
    sudo apt update
    sudo apt install python3 python3-pip python3-dev
 
-   # Install Reticulum
+   # Installiere Reticulum
    python3 -m pip install rns
 
 
 Reticulum auf Android
 ==============================================
-Reticulum kann auf Android auf verschiedene Arten verwendet werden. Der einfachste Weg zum
+Reticulum kann auf Android auf verschiedene Arten verwendet werden. Der einfachste Weg
 ist die Verwendung einer App wie `Sideband <https://unsigned.io/sideband>`_.
 
 Für mehr Kontrolle und Funktionen können Sie Reticulum und verwandte Programme über
 die `Termux-App <https://termux.com/>`_, die zum Zeitpunkt des Schreibens auf
-F-droid <https://f-droid.org>`_.
+F-droid <https://f-droid.org>`_. erhältlich ist,installieren.
 
 Termux ist ein Terminalemulator und eine Linux-Umgebung für Android-basierte Geräte,
 die die Möglichkeit bietet, viele verschiedene Programme und Bibliotheken zu nutzen,
 einschließlich Reticulum.
 
-Da das Python-Modul cryptography.io keine vorgefertigten Räder für
+Da das Python-Modul cryptography.io keine vorgefertigten Wheels für
 Android anbietet, funktioniert die standardmäßige Ein-Zeilen-Installation von Reticulum nicht unter Android,
 und es sind ein paar zusätzliche Befehle erforderlich.
 
@@ -321,53 +319,51 @@ Führen Sie in Termux die folgenden Schritte aus:
 
 .. code::
 
-    # First, make sure indexes and packages are up to date.
+    # Stellen Sie zunächst sicher, dass die Indizes und Pakete auf dem neuesten Stand sind.
     pkg update
     pkg upgrade
 
-    # Then install dependencies for the cryptography library.
+    # Installieren Sie dann die Abhängigkeiten für die Kryptographie-Bibliothek.
     pkg install python build-essential openssl libffi rust
 
-    # Make sure pip is up to date, and install the wheel module.
+    # Stellen Sie sicher, dass Pip auf dem neuesten Stand ist, und installieren Sie das wheel Modul.
     pip3 install wheel pip --upgrade
 
-    # To allow the installer to build the cryptography module,
-    # we need to let it know what platform we are compiling for:
+    # Damit das Installationsprogramm das Kryptographiemodul erstellen kann,
+    # wir müssen ihm mitteilen, für welche Plattform wir kompilieren:
     export CARGO_BUILD_TARGET="aarch64-linux-android"
 
-    # Start the install process for the cryptography module.
-    # Depending on your device, this can take several minutes,
-    # since the module must be compiled locally on your device.
+    # Starten Sie den Installationsprozess für das Kryptographiemodul.
+    # Je nach Gerät kann dies einige Minuten dauern,
+    # da das Modul lokal auf Ihrem Gerät kompiliert werden muss.
     pip3 install cryptography
 
-    # If the above installation succeeds, you can now install
-    # Reticulum and any related software
+    # Wenn die obige Installation erfolgreich war, können Sie nun Folgendes installieren
+    # Reticulum und zugehörige Software
     pip3 install rns
 
 Es ist auch möglich, Reticulum in Apps einzubinden, zb als
 Android APKs. Eine ausführliche Anleitung und ein Beispiel-Quellcode werden
-hier zu einem späteren Zeitpunkt veröffentlicht. Bis dahin können Sie den `Sideband-Quellcode <https://github.com/markqvist/sideband>`_ als Beispiel und Startpunkt verwenden.
+hier zu einem späteren Zeitpunkt veröffentlicht. 
+Bis dahin können Sie den `Sideband-Quellcode <https://github.com/markqvist/sideband>`_ als Beispiel und Startpunkt verwenden.
 
 Pure-Python Reticulum
 ==============================================
-In einigen seltenen Fällen und bei obskuren Systemtypen ist es nicht möglich, eine
-eine oder mehrere Abhängigkeiten zu installieren
 
 Auf ungewöhnlicheren Systemen und in einigen seltenen Fällen ist es möglicherweise nicht möglich
 ein oder mehrere der oben genannten Module zu installieren oder gar zu kompilieren. In solchen Situationen,
 können Sie das Paket ``rnspure`` anstelle des Pakets ``rns`` verwenden. Das ``rnspure``
 Paket benötigt keine externen Abhängigkeiten für die Installation. Bitte beachten Sie, dass der
 eigentliche Inhalt der Pakete ``rns`` und ``rnspure`` *völlig identisch* ist.
-Der einzige Unterschied besteht darin, dass das Paket ``rnspure`` keine Abhängigkeiten auflistet, die für die Installation
+Der einzige Unterschied besteht darin, dass das Paket ``rnspure`` keine Abhängigkeiten auflistet,
 für die Installation.
 
 Unabhängig davon, wie Reticulum installiert und gestartet wird, lädt es externe Abhängigkeiten
-nur, wenn sie *benötigt* und *verfügbar* sind. Wenn Sie Reticulum zum Beispiel auf einem System verwenden wollen
+nur, wenn sie *benötigt* und *verfügbar* sind. Wenn Sie Reticulum zum Beispiel
 auf einem System verwenden wollen, das ``pyserial`` nicht unterstützt, ist es durchaus möglich, dies mit dem
-Paket ``rnspure`` zu verwenden, aber Reticulum kann dann keine seriellen Schnittstellen verwenden.
+Paket ``rnspure`` zu tun, aber Reticulum kann dann keine seriellen Schnittstellen verwenden.
 Alle anderen verfügbaren Module werden weiterhin geladen, wenn sie benötigt werden.
 
 **Bitte beachten Sie!** Wenn Sie das Paket `rnspure` verwenden, um Reticulum auf Systemen zu betreiben, die
-die `PyCA/Kryptographie <https://github.com/pyca/cryptography>`_ nicht unterstützen, ist es
-ist es wichtig, dass Sie den Abschnitt :ref:`Cryptographic Primitives <understanding-primitives>`` lesen und verstehen.
-Abschnitt dieses Handbuchs lesen und verstehen.
+die `PyCA/Kryptographie <https://github.com/pyca/cryptography>`_ nicht unterstützen, 
+ist es wichtig, dass Sie den Abschnitt :ref:`Cryptographic Primitives <understanding-primitives>`` dieses Handbuchs lesen und verstehen.
