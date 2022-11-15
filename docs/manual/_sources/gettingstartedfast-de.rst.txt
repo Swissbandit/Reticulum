@@ -305,7 +305,7 @@ ist die Verwendung einer App wie `Sideband <https://unsigned.io/sideband>`_.
 
 Für mehr Kontrolle und Funktionen können Sie Reticulum und verwandte Programme über
 die `Termux-App <https://termux.com/>`_, die zum Zeitpunkt des Schreibens auf
-F-droid <https://f-droid.org>`_. erhältlich ist,installieren.
+`F-droid <https://f-droid.org>`_. erhältlich ist, installieren.
 
 Termux ist ein Terminalemulator und eine Linux-Umgebung für Android-basierte Geräte,
 die die Möglichkeit bietet, viele verschiedene Programme und Bibliotheken zu nutzen,
