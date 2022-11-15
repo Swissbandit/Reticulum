@@ -12,9 +12,9 @@ Sie können diese Beispiele verwenden, um zu lernen, wie Sie Ihre eigenen Progra
 Minimal
 =======
 
-Das Beispiel *Minimal* demonstriert die Mindestvoraussetzungen für die Verbindung mit einem Reticulum-Netzwerk
+Das Beispiel *Minimal* demonstriert die Mindestvoraussetzungen für die Verbindung mit einem
 Reticulum-Netzwerk aus Ihrem Programm heraus herzustellen. In etwa fünf Zeilen Code werden Sie
-den Reticulum Network Stack initialisiert und bereit, den Datenverkehr in Ihrem Programm
+den Reticulum Network Stack initialisiert und bereit haben, den Datenverkehr in Ihrem
 Programm weiterzuleiten.
 
 .. literalinclude:: ../../Examples/Minimal.py
@@ -28,7 +28,7 @@ Ankündigung.
 
 Das Beispiel *Ankündigung* baut auf dem vorherigen Beispiel auf und zeigt, wie man
 ein Ziel im Netz ankündigt, und wie Ihr Programm Benachrichtigungen über
-Benachrichtigungen über Ankündigungen von relevanten Zielen erhält.
+Ankündigungen von relevanten Zielen erhält.
 
 .. literalinclude:: ../../Examples/Announce.py
 
@@ -38,6 +38,7 @@ Dieses Beispiel ist auch zu finden unter `<https://github.com/markqvist/Reticulu
 
 Übertragung
 =========
+
 Das Beispiel *Übertragung* zeigt, wie Klartext-Broadcast-Nachrichten
 über das Netzwerk übertragen werden.
 
@@ -50,8 +51,7 @@ Dieses Beispiel ist auch zu finden unter `<https://github.com/markqvist/Reticulu
 Echo
 ====
 
-Das Beispiel *Echo* demonstriert die Kommunikation zwischen zwei Zielen über die
-der Paketschnittstelle.
+Das Beispiel *Echo* demonstriert die Kommunikation zwischen zwei Zielen über die Paketschnittstelle.
 
 .. literalinclude:: ../../Examples/Echo.py
 
@@ -96,9 +96,9 @@ Dieses Beispiel ist auch zu finden unter `<https://github.com/markqvist/Reticulu
 Filetransfer
 ============
 
-Das Beispiel *Filetransfer* implementiert ein einfaches Dateiserverprogramm, das
-das es Clients ermöglicht, sich zu verbinden und Dateien herunterzuladen. Das Programm verwendet die Schnittstelle Resource
-Schnittstelle, um Dateien beliebiger Größe effizient über einen Reticulum :ref:`Link<api-link>` zu übertragen.
+Das Beispiel *Filetransfer* implementiert ein einfaches Dateiserverprogramm,
+welches Clients ermöglicht, sich zu verbinden und Dateien herunterzuladen. Das Programm verwendet die Schnittstelle Resource, 
+um Dateien beliebiger Größe effizient über einen Reticulum :ref:`Link<api-link>` zu übertragen.
 
 .. literalinclude:: ../../Examples/Filetransfer.py
 
