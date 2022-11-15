@@ -1,0 +1,245 @@
+.. _hardware-main:
+
+***********************
+Kommunikations Hardware
+***********************
+
+Einer der wirklich wertvollen Aspekte von Reticulum ist die Möglichkeit, es über
+fast jedes denkbare Kommunikationsmedium zu nutzen. Die :ref:`Schnittstellentypen<Schnittstellen-Haupt>`
+die in Reticulum konfiguriert werden können, sind flexibel genug, um die Verwendung
+kabelgebundenen und drahtlosen Kommunikationshardware abzudecken, von jahrzehntealten
+Packet-Radio-Modems bis hin zu modernen Millimeterwellen-Backhaul-Systemen.
+
+Wenn Sie bereits irgendeine Art von Kommunikationshardware besitzen oder betreiben, ist die
+stehen die Chancen sehr gut, dass sie mit Reticulum funktioniert. Sollte dies nicht der Fall sein
+nicht, ist es möglich, den nötigen Kleber mit sehr wenig Aufwand bereitzustellen.
+zum Beispiel das :ref:`PipeInterface<interfaces-pipe>` oder das :ref:`TCPClientInterface<interfaces-tcpc>`
+in Kombination mit Code wie `TCP KISS Server <https://github.com/simplyequipped/tcpkissserver>`_
+von `simplyequipped <https://github.com/simplyequipped>`_.
+
+Während diese breite Unterstützung und Flexibilität sehr nützlich ist, kann eine Fülle von Optionen
+kann es manchmal schwierig machen, zu wissen, wo man anfangen soll, besonders wenn man
+von Grund auf neu anfangen.
+
+In diesem Kapitel werden ein paar verschiedene sinnvolle Wege aufgezeigt, um
+funktionsfähige drahtlose Kommunikation mit minimalen Kosten und
+und Aufwand. Es werden zwei grundlegende Gerätekategorien behandelt, *RNodes* und
+*WiFi-basierte Funkgeräte*.
+
+Es gibt zwar noch viele andere Gerätekategorien, die für den Aufbau von Reticulum
+Netze nützlich sind, aber wenn man weiß, wie man nur diese beiden verwendet, kann man
+eine Vielzahl von nützlichen Netzwerken mit geringem Aufwand aufzubauen.
+
+.. _rnode-main:
+
+RNode
+=====
+
+Zuverlässige und universell einsetzbare digitale Langstrecken-Funkübertragungssysteme sind
+sind in der Regel entweder sehr teuer, schwierig einzurichten und zu betreiben, schwer zu beschaffen,
+schwer zu beschaffen, stromhungrig oder alle diese Faktoren gleichzeitig. In einem Versuch, diese Situation zu entschärfen
+wurde das Transceiver-System *RNode* entwickelt. Es ist wichtig zu
+dass es sich bei RNode nicht um ein bestimmtes Gerät eines bestimmten Herstellers handelt, sondern
+eine *offene Plattform*, die jeder nutzen kann, um interoperable digitale Sende- und Empfangsgeräte zu bauen
+die für ihre Bedürfnisse und besonderen Situationen geeignet sind.
+
+Ein RNode ist ein universell einsetzbares, interoperables, zuverlässiges Gerät mit geringer Leistung und großer Reichweite,
+offenes und flexibles Funkkommunikationsgerät. Je nach seinen Komponenten kann er
+auf vielen verschiedenen Frequenzbändern arbeiten und viele verschiedene Modulationsverfahren verwenden
+Modulationsverfahren arbeiten, aber in der Regel und für die Zwecke dieses Kapitels werden wir uns auf
+Wir beschränken uns in diesem Kapitel auf RNodes, die die *LoRa*-Modulation in den üblichen ISM-Bändern verwenden.
+
+**Vermeiden Sie Verwirrung!** RNodes können LoRa als *Physical-Layer-Modulation* verwenden, aber es
+hat aber nichts mit dem *LoRaWAN*-Protokoll und -Standard zu tun, die üblicherweise für zentral gesteuerte
+für zentral gesteuerte IoT-Geräte verwendet werden. RNodes verwenden *raw LoRa-Modulation*, ohne
+ohne zusätzlichen Protokoll-Overhead. Die gesamte High-Level-Protokollfunktionalität wird
+direkt von Reticulum.
+
+.. _rnode-creating:
+
+RNodes erstellen
+^^^^^^^^^^^^^^^
+RNode wurde als ein System konzipiert, das sich leicht über Zeit und Raum hinweg replizieren lässt.
+Raum. Sie können einen funktionierenden Transceiver mit allgemein verfügbaren
+Komponenten und ein paar Open-Source-Software-Tools zusammenstellen. Sie können RNodes komplett neu entwerfen und bauen
+komplett von Grund auf neu entwerfen und bauen, und zwar genau nach Ihren gewünschten Spezifikationen.
+wird der einfachste Ansatz zur Erstellung von RNodes erläutert: Verwendung gängiger
+LoRa-Entwicklungsplatinen. Dieser Ansatz kann auf zwei einfache Schritte reduziert werden:
+
+1. Besorgen Sie sich ein oder mehrere unterstützte Entwicklungsboards
+2. Installieren Sie die RNode-Firmware mit dem automatischen Installationsprogramm
+
+Sobald die Firmware installiert und durch das Installationsskript bereitgestellt wurde, ist sie
+ist es bereit, mit jeder Software verwendet zu werden, die RNodes unterstützt, einschließlich Reticulum.
+Das Gerät kann mit Reticulum verwendet werden, indem ein :ref:`RNodeInterface<interfaces-rnode>`
+zur Konfiguration hinzufügt.
+
+.. _rnode-supported:
+
+Unterstützte Boards
+^^^^^^^^^^^^^^^^
+Um einen oder mehrere RNodes zu erstellen, müssen Sie unterstützte Entwicklungs
+Boards. Die folgenden Boards werden vom Auto-Installer unterstützt.
+
+LilyGO LoRa32 v2.1
+""""""""""""""""""
+.. image:: graphics/board_t3v21.png
+    :width: 46%
+    :align: center
+
+- **Supported Firmware Lines** v1.x & v2.x
+- **Transceiver IC** Semtech SX1276
+- **Device Platform** ESP32
+- **Manufacturer** `LilyGO <https://lilygo.cn>`_
+
+
+LilyGO LoRa32 v2.0
+""""""""""""""""""
+.. image:: graphics/board_t3v20.png
+    :width: 46%
+    :align: center
+
+- **Supported Firmware Lines** v1.x & v2.x
+- **Transceiver IC** Semtech SX1276
+- **Device Platform** ESP32
+- **Manufacturer** `LilyGO <https://lilygo.cn>`_
+
+
+LilyGO T-Beam
+"""""""""""""
+.. image:: graphics/board_tbeam.png
+    :width: 75%
+    :align: center
+
+- **Supported Firmware Lines** v1.x & v2.x
+- **Transceiver IC** Semtech SX1276
+- **Device Platform** ESP32
+- **Manufacturer** `LilyGO <https://lilygo.cn>`_
+
+
+Heltec LoRa32 v2.0
+""""""""""""""""""
+.. image:: graphics/board_heltec32.png
+    :width: 58%
+    :align: center
+
+- **Supported Firmware Lines** v1.x & v2.x
+- **Transceiver IC** Semtech SX1276
+- **Device Platform** ESP32
+- **Manufacturer** `Heltec Automation <https://heltec.org>`_
+
+
+Unsigned RNode v2.x
+"""""""""""""""""""
+.. image:: graphics/board_rnodev2.png
+    :width: 58%
+    :align: center
+
+- **Supported Firmware Lines** v1.x & v2.x
+- **Transceiver IC** Semtech SX1276
+- **Device Platform** ESP32
+- **Manufacturer** `unsigned.io <https://unsigned.io>`_
+
+
+Unsigned RNode v1.x
+"""""""""""""""""""
+.. image:: graphics/board_rnode.png
+    :width: 50%
+    :align: center
+
+- **Supported Firmware Lines** v1.x
+- **Transceiver IC** Semtech SX1276
+- **Device Platform** AVR ATmega1284p
+- **Manufacturer** `unsigned.io <https://unsigned.io>`_
+
+
+.. _rnode-installation:
+
+Installation
+^^^^^^^^^^^^
+
+Sobald Sie kompatible Karten erhalten haben, können Sie die `RNode Firmware <https://github.com/markqvist/RNode_Firmware>`_ installieren.
+mit Hilfe des ``RNode Configuration Utility <https://github.com/markqvist/rnodeconfigutil>`_.
+Stellen Sie sicher, dass ``Python3`` und ``pip`` auf Ihrem System installiert ist, und installieren Sie dann
+das Konfigurationsprogramm mit ``pip``:
+
+.. code::
+
+   pip3 install rnodeconf
+
+Sobald die Installation abgeschlossen ist, können Sie mit der Installation der Firmware auf Ihren
+Geräte zu installieren. Starten Sie ``rnodeconf`` im Auto-Installationsmodus wie folgt:
+
+.. code::
+
+   rnodeconf --autoinstall
+
+Das Dienstprogramm führt Sie durch den Installationsprozess, indem es Ihnen eine Reihe von Fragen
+Fragen zu Ihrer Hardware stellt. Folgen Sie einfach der Anleitung, und das Dienstprogramm wird
+Ihre Geräte automatisch installieren und konfigurieren
+
+**Wichtiger Hinweis!** Es wird derzeit empfohlen, die v1.x-Linie der RNode-Firmware zu verwenden,
+zu verwenden, auch wenn die v2.x-Linie für frühe Tests verfügbar ist. Die v2.x-Linie sollte noch als
+experimentelle Vorabversion betrachtet werden. Verwenden Sie die v2.x-Firmware nur, wenn Sie die absolut neueste Version testen wollen
+die absolut neueste Version testen wollen und sich nicht um die Stabilität kümmern.
+
+.. _rnode-usage:
+
+Verwendung mit Reticulum
+^^^^^^^^^^^^^^^^^^^^
+Nachdem die Geräte installiert und bereitgestellt wurden, können Sie sie mit Reticulum
+verwenden, indem Sie der Konfigurationsdatei von Reticulum den Abschnitt :ref:`relevante Schnittstelle<interfaces-rnode>` hinzufügen.
+Datei von Reticulum hinzufügen. Für v1.x-Firmwares müssen Sie alle Schnittstellenparameter angeben,
+wie z. B. serielle Schnittstelle und On-Air-Parameter. Bei v2.x-Firmwares müssen Sie nur Folgendes angeben
+Sie müssen lediglich die Verbindungs-ID des RNode angeben, und Reticulum sucht automatisch nach dem RNode und stellt eine Verbindung zu ihm her.
+RNode, wobei die im RNode selbst gespeicherten Parameter verwendet werden.
+
+.. _rnode-suppliers:
+
+Anbieter
+^^^^^^^^^
+Setzen Sie sich mit uns in Verbindung, wenn Sie Ihren RNode-Lieferanten hier auflisten lassen wollen, oder wenn Sie Hilfe benötigen, um
+mit der Produktion von RNodes zu beginnen.
+
+
+WiFi-basierte Hardware
+===================
+
+Es ist möglich, alle Arten von WiFi-basierter Hardware mit kurzer und langer Reichweite zu verwenden.
+mit Reticulum zu verwenden. Jede Art von Hardware, die Bridged Ethernet über die
+WiFi-Schnittstelle unterstützt, funktioniert mit dem :ref:`AutoInterface<interfaces-auto>` in Reticulum.
+Die meisten Geräte verhalten sich standardmäßig so oder erlauben dies über Konfigurationsoptionen.
+
+Das bedeutet, dass Sie einfach die physischen Verbindungen der WiFi-basierten Geräte konfigurieren können,
+und mit Reticulum darüber kommunizieren. Es ist nicht notwendig, eine IP
+Infrastruktur wie DHCP-Server, DNS oder ähnliches zu aktivieren, solange zumindest Ethernet
+verfügbar ist und die Pakete transparent über die physischen WiFi-basierten Geräte weitergeleitet werden.
+
+.. only:: html
+
+    .. image:: graphics/radio_rblhg5.png
+        :width: 49%
+
+    .. image:: graphics/radio_is5ac.png
+        :width: 49%
+
+Im Folgenden finden Sie eine Liste von Beispielen für WiFi-Funkgeräte (und ähnliche Geräte), die sich für hohe Kapazitäten eignen
+Netzverbindungen über große Entfernungen:
+
+- `Ubiquiti airMAX radios <https://store.ui.com/collections/operator-airmax-devices>`_
+- `Ubiquiti LTU radios <https://store.ui.com/collections/operator-ltu>`_
+- `MikroTik radios <https://mikrotik.com/products/group/wireless-systems>`_
+
+Diese Liste ist keineswegs erschöpfend und dient nur als Beispiel für Funkgeräte
+die relativ günstig ist und gleichzeitig eine große Reichweite und hohe Kapazität für Reticulum
+Netzwerke bieten. Wie in allen anderen Fällen ist es auch für Reticulum möglich, mit IP
+Netzen koexistieren, die gleichzeitig auf solchen Geräten laufen.
+
+Kombinieren von Hardware-Typen
+========================
+
+Es ist sinnvoll, verschiedene Verbindungs- und Hardwaretypen beim Entwurf und Aufbau eines
+Aufbau eines Netzes zu kombinieren. Ein nützliches Entwurfsmuster ist die Verwendung von Punkt-zu-Punkt-Verbindungen mit hoher Kapazität
+Punkt-zu-Punkt-Verbindungen auf Basis von WiFi- oder Millimeterwellen-Funkgeräten (mit Richtantennen mit hoher Verstärkung)
+für das Netz-Backbone und die Verwendung von LoRa-basierten RNodes für die Abdeckung großer Bereiche mit
+Konnektivität für Client-Geräte.
