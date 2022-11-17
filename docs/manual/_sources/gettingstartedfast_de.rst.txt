@@ -26,7 +26,7 @@ Funkschnittstellen können dann später hinzugefügt werden.
 Nomad Network
 ^^^^^^^^^^^^^
 
-Das terminalbasierte Programm "Nomad Network <https://github.com/markqvist/nomadnet>`_
+Das terminalbasierte Programm `Nomad Network <https://github.com/markqvist/nomadnet>`_
 bietet eine vollständige verschlüsselte Kommunikationssuite, die mit Reticulum erstellt wurde. Es bietet
 verschlüsselte Nachrichtenübermittlung (sowohl direkte als auch verzögerte Zustellung für Offline-Benutzer), Dateiaustausch,
 und hat einen eingebauten Textbrowser und Seitenserver mit Unterstützung für dynamisch gerenderte Seiten,
@@ -58,7 +58,7 @@ Sideband
 ^^^^^^^^
 
 Wenn Sie lieber ein Programm mit einer grafischen Benutzeroberfläche verwenden möchten, können Sie sich
-Sideband <https://unsigned.io/sideband>`_ ansehen, das für Android, Linux und macOS verfügbar ist.
+`Sideband <https://unsigned.io/sideband>`_ ansehen, das für Android, Linux und macOS verfügbar ist.
 
 .. image:: screenshots/sideband_1.png
     :align: center
