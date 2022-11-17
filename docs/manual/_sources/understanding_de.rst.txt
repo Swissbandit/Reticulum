@@ -1,0 +1,860 @@
+.. _understanding-main:
+
+***********************
+Reticulum verstehen
+***********************
+In diesem Kapitel werden der allgemeine Zweck und die Funktionsweise von Reticulum kurz beschrieben.
+Es soll Ihnen einen Überblick über die Funktionsweise des Stacks und ein Verständnis dafür vermitteln, wie Sie
+vernetzte Anwendungen mit Reticulum zu entwickeln.
+
+Dieses Kapitel ist keine erschöpfende Quelle für Informationen über Reticulum, zumindest noch nicht. Derzeit
+das einzige vollständige Repository und die letzte Instanz für die Funktionsweise von Reticulum ist die Python
+Referenzimplementierung und API-Referenz. Davon abgesehen ist dieses Kapitel eine wichtige Quelle, um
+zu verstehen, wie Reticulum aus einer High-Level-Perspektive funktioniert, sowie die allgemeinen Prinzipien von
+Reticulum und wie Sie diese bei der Entwicklung Ihrer eigenen Netzwerke oder Software anwenden können.
+
+Nach der Lektüre dieses Dokuments sollten Sie gut gerüstet sein, um zu verstehen, wie ein Reticulum-Netzwerk
+funktioniert, was es leisten kann und wie Sie es selbst nutzen können. Wenn Sie bei der Entwicklung mithelfen wollen
+Entwicklung mitwirken wollen, ist dies ebenfalls ein guter Ausgangspunkt, denn es gibt einen klaren Überblick über die
+Philosophie, die hinter Reticulum steht, welche Probleme es zu lösen versucht und wie es diese
+diese Lösungen angeht.
+
+.. _understanding-motivation:
+
+Motivation
+==========
+
+Die Hauptmotivation für die Entwicklung und Implementierung von Reticulum war der derzeitige Mangel an
+zuverlässigen, funktionalen und sicheren Minimalinfrastrukturen für die digitale Kommunikation. Es ist meine
+Es ist meine Überzeugung, dass es höchst wünschenswert ist, einen zuverlässigen und effizienten Weg zu schaffen, um weitreichende digitale
+Kommunikationsnetze zu schaffen, die den sicheren Austausch von Informationen zwischen Menschen und
+Maschinen, ohne zentrale Autorität, Kontrolle, Zensur oder Zugangsbeschränkungen.
+
+Nahezu alle der heute verwendeten Vernetzungssysteme weisen eine gemeinsame Einschränkung auf: Sie
+Sie erfordern ein hohes Maß an Koordination und zentralem Vertrauen und Macht, um zu funktionieren. Um solchen Netzen beizutreten, braucht man die Zustimmung
+von kontrollierenden Gatekeepern. Dieser Bedarf an Koordination und Vertrauen führt unweigerlich zu einer Umgebung
+zentraler Kontrolle, in der es für Infrastrukturbetreiber oder Regierungen sehr einfach ist, den Verkehr zu kontrollieren oder zu verändern
+Verkehr zu kontrollieren oder zu verändern und unerwünschte Akteure zu zensieren oder zu verfolgen. Das macht es auch völlig unmöglich, Netze frei zu installieren
+und Netze nach Belieben einzusetzen und zu nutzen, so wie man es mit anderen gängigen Werkzeugen tun würde, die die individuelle Handlungsfähigkeit und Freiheit fördern.
+
+Reticulum zielt darauf ab, so wenig Koordination und Vertrauen wie möglich zu erfordern. Es soll ein sicheres,
+anonyme und erlaubnisfreie Vernetzung und Informationsaustausch zu einem Werkzeug machen, das jeder einfach in die Hand nehmen und nutzen kann.
+
+Da Reticulum völlig medienunabhängig ist, kann es zum Aufbau von Netzen auf dem jeweils am besten geeigneten
+Situation am besten geeignet ist, oder was immer Sie zur Verfügung haben. In manchen Fällen kann dies eine Paketfunk
+Funkverbindungen über VHF-Frequenzen, in anderen Fällen ein 2,4-GHz
+Netzwerk mit handelsüblichen Funkgeräten sein, oder es können gängige LoRa-Entwicklungsplatinen verwendet werden.
+
+Zum Zeitpunkt der Veröffentlichung dieses Dokuments ist das schnellste und einfachste Setup für Entwicklung und Tests die Verwendung von
+LoRa-Funkmodule mit einer Open-Source-Firmware (siehe Abschnitt :ref:`Referenz-Setup<Verständnis-Referenzsystem>`),
+angeschlossen an einen beliebigen Computer oder ein mobiles Gerät, auf dem Reticulum laufen kann.
+
+Das Ziel von Reticulum ist es, jedem die Möglichkeit zu geben, sein eigener Netzbetreiber zu sein, und es
+kostengünstig und einfach große Gebiete mit einer Vielzahl unabhängiger, zusammenschaltbarer und autonomer Netze abzudecken.
+Reticulum ist **nicht** *ein Netzwerk*, es ist **ein Werkzeug** zum Aufbau von *Tausenden von Netzwerken*. Netzwerke ohne
+Kill-Switches, Überwachung, Zensur und Kontrolle. Netze, die frei interagieren, sich verbinden und trennen können
+miteinander verbinden und trennen können und keine zentrale Aufsicht benötigen. Netze für Menschen. *Netzwerke für die Menschen*.
+
+.. _understanding-goals:
+
+Ziele
+=====
+
+Um eine möglichst breite Nutzung und einen effizienten Einsatz zu ermöglichen, wurden die folgenden Ziele verfolgt
+die Entwicklung von Reticulum geleitet:
+
+
+* **Fully useable as open source software stack**
+    Reticulum must be implemented with, and be able to run using only open source software. This is
+    critical to ensuring the availability, security and transparency of the system.
+* **Hardware layer agnosticism**
+    Reticulum must be fully hardware agnostic, and shall be useable over a wide range of
+    physical networking layers, such as data radios, serial lines, modems, handheld transceivers,
+    wired Ethernet, WiFi, or anything else that can carry a digital data stream. Hardware made for
+    dedicated Reticulum use shall be as cheap as possible and use off-the-shelf components, so
+    it can be easily modified and replicated by anyone interested in doing so.
+* **Very low bandwidth requirements**
+    Reticulum should be able to function reliably over links with a transmission capacity as low
+    as *500 bits per second*.
+* **Encryption by default**
+    Reticulum must use strong encryption by default for all communication.
+* **Initiator Anonymity**
+    It must be possible to communicate over a Reticulum network without revealing any identifying
+    information about oneself.
+* **Unlicensed use**
+    Reticulum shall be functional over physical communication mediums that do not require any
+    form of license to use. Reticulum must be designed in a way, so it is usable over ISM radio
+    frequency bands, and can provide functional long distance links in such conditions, for example
+    by connecting a modem to a PMR or CB radio, or by using LoRa or WiFi modules.
+* **Supplied software**
+    In addition to the core networking stack and API, that allows a developer to build
+    applications with Reticulum, a basic set of Reticulum-based communication tools must be
+    implemented and released along with Reticulum itself. These shall serve both as a
+    functional, basic communication suite, and as an example and learning resource to others wishing
+    to build applications with Reticulum.
+* **Ease of use**
+    The reference implementation of Reticulum is written in Python, to make it easy to use
+    and understand. A programmer with only basic experience should be able to use
+    Reticulum to write networked applications.
+* **Low cost**
+    It shall be as cheap as possible to deploy a communication system based on Reticulum. This
+    should be achieved by using cheap off-the-shelf hardware that potential users might already
+    own. The cost of setting up a functioning node should be less than $100 even if all parts
+    needs to be purchased.
+
+.. _understanding-basicfunctionality:
+
+Einführung & Grundlegende Funktionsweise
+==================================
+
+Reticulum ist ein Netzwerkstack, der für Verbindungen mit hoher Latenz und geringer Bandbreite geeignet ist. Reticulum ist im Kern ein
+Kern ein *nachrichtenorientiertes* System. Es eignet sich sowohl für lokale Punkt-zu-Punkt- als auch für Punkt-zu-Multipunkt
+Punkt-zu-Punkt- oder Punkt-zu-Mehrpunkt-Szenarien, bei denen sich alle Knoten in Reichweite befinden, als auch für Szenarien, bei denen Pakete
+über mehrere Sprünge in einem komplexen Netz transportiert werden müssen, um den Empfänger zu erreichen.
+
+Reticulum verzichtet auf das Konzept der Adressen und Ports, die von IP, TCP und UDP bekannt sind. Stattdessen verwendet
+verwendet Reticulum das einzigartige Konzept der *Destinationen*. Jede Anwendung, die Reticulum als
+Netzwerkstack verwendet, muss ein oder mehrere Ziele erstellen, um Daten zu empfangen, und die
+Ziele kennen, an die sie Daten senden muss.
+
+Alle Ziele in Reticulum werden als 16-Byte-Hash dargestellt. Dieser Hash wird durch Abschneiden eines vollständigen
+SHA-256-Hash der identifizierenden Merkmale des Ziels. Für die Benutzer werden die Zieladressen
+als 16 hexadezimale Bytes angezeigt, wie in diesem Beispiel: ``<13425ec15b621c1d928589718000d814>``.
+
+Die Abschneidegröße von 16 Byte (128 Bit) für Ziele wurde als vernünftiger Kompromiss zwischen
+zwischen Adressraum
+und Paket-Overhead gewählt. Der Adressraum, der durch diese Größe abgedeckt wird, kann viele Milliarden von
+gleichzeitig aktiven Geräten im selben Netz unterstützen und gleichzeitig den Paket-Overhead gering halten, was in
+was in Netzen mit geringer Bandbreite unerlässlich ist. In dem sehr unwahrscheinlichen Fall, dass dieser Adressraum kurz vor einer
+eine Überlastung droht, kann der Reticulum-Adressraum durch eine einzeilige Codeänderung auf 256
+Bits erweitert werden, wodurch sichergestellt wird, dass der Reticulum-Adressraum potenziell Netzwerke von galaktischem Ausmaß unterstützen kann.
+Dies ist natürlich eine völlige und lächerliche Überbelegung, und daher sollten die derzeitigen 128 Bit
+ausreichend sein, selbst weit in die Zukunft hinein.
+
+Standardmäßig verschlüsselt Reticulum alle Daten mit elliptischer Kurvenkryptographie und AES. Jedes Paket, das an ein
+Ziel gesendeten Pakete werden mit einem pro Paket abgeleiteten Schlüssel verschlüsselt. Reticulum kann auch einen verschlüsselten
+Kanal zu einem Ziel aufbauen, der als *Link* bezeichnet wird. Sowohl über Links versendete Daten als auch einzelne Pakete bieten
+*Initiator Anonymity*, und Links bieten zusätzlich *Forward Secrecy* durch Verwendung eines Elliptic Curve
+Diffie-Hellman-Schlüsselaustausch auf Curve25519 zur Ableitung ephemerer Schlüssel pro Link. Die Multi-Hop-Transport,
+Koordinations-, Verifikations- und Zuverlässigkeitsschichten sind völlig autonom und basieren ebenfalls auf elliptischer
+Kurven-Kryptographie.
+
+Reticulum bietet auch symmetrische Verschlüsselung für gruppenorientierte Kommunikation sowie
+unverschlüsselte Pakete für lokale Broadcast-Zwecke.
+
+Reticulum kann an eine Vielzahl von Schnittstellen wie Funkmodems, Datenfunkgeräte und serielle Schnittstellen angeschlossen werden,
+und bietet die Möglichkeit, den Reticulum-Datenverkehr über IP-Verbindungen wie das Internet oder
+private IP-Netzwerke.
+
+.. _understanding-destinations:
+
+Zielorte
+------------
+
+Um Daten mit dem Reticulum-Stack zu empfangen und zu senden, muss eine Anwendung ein oder mehrere
+Ziele erstellen. Reticulum verwendet drei verschiedene grundlegende Zieltypen und einen speziellen:
+
+
+* **Single**
+    Der Typ *einzelnes* Ziel ist der häufigste Typ in Reticulum und sollte für die meisten Zwecke verwendet werden.
+    die meisten Zwecke verwendet werden. Er wird immer durch einen eindeutigen öffentlichen Schlüssel identifiziert. Alle an dieses Ziel gesendeten Daten
+    Ziel gesendeten Daten werden mit ephemeren Schlüsseln verschlüsselt, die aus einem ECDH-Schlüsselaustausch stammen, und sind
+    und sind nur für den Ersteller des Ziels lesbar, der den entsprechenden privaten Schlüssel besitzt.
+* **Plain**
+    Ein *plain* Zieltyp ist unverschlüsselt und eignet sich für Datenverkehr, der an eine
+    mehrere Benutzer verteilt werden soll oder für jedermann lesbar sein soll. Der Verkehr zu einem *plain* Ziel ist nicht verschlüsselt.
+    Im Allgemeinen können *plain*-Ziele für Broadcast-Informationen verwendet werden, die für die Öffentlichkeit bestimmt sind.
+    Einfache Ziele sind nur direkt erreichbar, und an einfache Ziele adressierte Pakete werden
+    werden niemals über mehrere Sprünge im Netz transportiert. Um in Reticulum über mehrere Sprünge transportiert werden zu können, müssen Informationen
+    verschlüsselt sein *müssen*, da Reticulum die Verschlüsselung pro Paket verwendet, um Routing-Pfade zu verifizieren und
+    aufrechtzuerhalten.
+* **Group**
+    Der spezielle Zieltyp *group*, der ein symmetrisch verschlüsseltes virtuelles Ziel definiert.
+    Daten, die an dieses Ziel gesendet werden, werden mit einem symmetrischen Schlüssel verschlüsselt und sind für jeden lesbar, der den Schlüssel besitzt.
+    Jeder, der im Besitz des Schlüssels ist, kann sie lesen, aber wie beim Zieltyp *plain* werden Pakete an diesen Typ
+    Pakete an diesen Zieltyp werden derzeit nicht über mehrere Sprünge transportiert, obwohl ein geplantes Upgrade
+    zu Reticulum wird global erreichbare *Gruppen*-Ziele ermöglichen.
+* **Link**
+    Ein *Link* ist ein spezieller Zieltyp, der als abstrakter Kanal zu einem *einzigen* Ziel dient
+    Ziel, direkt verbunden oder über mehrere Sprünge. Der *Link* bietet auch Zuverlässigkeit und
+    effizientere Verschlüsselung, Vorwärtsgeheimnis, Anonymität des Initiators und kann daher auch dann nützlich sein
+    wenn ein Knoten direkt erreichbar ist. Außerdem bietet er eine leistungsfähigere API und ermöglicht die einfache Durchführung von
+    Durchführung von Anfragen und Antworten, großen Datenübertragungen und mehr.
+
+.. _understanding-destinationnaming:
+
+Zielort Benennung
+^^^^^^^^^^^^^^^^^^
+
+Die Ziele werden in einer leicht verständlichen gepunkteten Notation von *Aspekten* erstellt und benannt und
+im Netz als Hash-Wert dieses Wertes dargestellt. Der Hash ist ein auf 128 Bit gekürzter SHA-256. Der
+Aspekt der obersten Ebene sollte immer ein eindeutiger Bezeichner für die Anwendung sein, die das Ziel verwendet.
+Die nächsten Ebenen von Aspekten können vom Ersteller der Anwendung auf beliebige Weise definiert werden.
+
+Die Aspekte können so lang und zahlreich wie nötig sein, und ein langer Zielname hat keine Auswirkungen auf die Effizienz.
+Effizienz beeinträchtigen, da Namen im Netz immer als verkürzte SHA-256-Hashes dargestellt werden.
+
+Ein Ziel für eine Umweltüberwachungsanwendung könnte zum Beispiel aus dem
+Anwendungsnamen, einem Gerätetyp und einem Messtyp bestehen, etwa so:
+
+.. code-block:: text
+
+   app name  : environmentlogger
+   aspects   : remotesensor, temperature
+
+   full name : environmentlogger.remotesensor.temperature
+   hash      : 4faf1b2e0a077e6a9d92fa051f256038
+
+Bei einem *einzigen* Ziel fügt Reticulum automatisch den zugehörigen öffentlichen Schlüssel als
+Zielaspekt vor dem Hashing an. Auf diese Weise wird sichergestellt, dass nur das richtige Ziel erreicht wird,
+da jeder jeden Zielnamen abhören kann. Durch das Anhängen des öffentlichen Schlüssels wird sichergestellt, dass ein bestimmtes
+Paket nur an das Ziel geleitet wird, das den entsprechenden privaten Schlüssel zur Entschlüsselung des Pakets besitzt.
+Pakets besitzt.
+
+**Achtung!** Hier gibt es ein sehr wichtiges Konzept zu verstehen:
+
+* Jeder kann den Zielnamen verwenden ``environmentlogger.remotesensor.temperature``
+
+* Jedes Ziel, das dies tut, hat immer noch einen eindeutigen Ziel-Hash und ist somit eindeutig
+  adressierbar sein, da sich ihre öffentlichen Schlüssel unterscheiden werden.
+
+Bei der tatsächlichen Verwendung von *einzelnen* Zielnamen ist es ratsam, keine eindeutig identifizierenden
+Merkmale bei der Benennung von Aspekten zu verwenden. Aspektnamen sollten allgemeine Begriffe sein, die beschreiben, welche Art von Ziel
+repräsentiert wird. Der eindeutig identifizierende Aspekt wird immer durch das Anhängen des öffentlichen Schlüssels erreicht,
+der das Ziel in ein eindeutig identifizierbares erweitert. Reticulum tut dies automatisch.
+
+Jedes Ziel in einem Reticulum-Netzwerk kann adressiert und erreicht werden, indem man einfach den
+Ziel-Hash (und den öffentlichen Schlüssel, aber wenn der öffentliche Schlüssel nicht bekannt ist, kann er vom
+Netzwerk angefordert werden, indem man einfach den Ziel-Hash kennt). Die Verwendung von App-Namen und Aspekten macht es einfach
+Reticulum-Programme zu strukturieren und zu filtern, welche Informationen und Daten Ihr Programm
+empfängt.
+
+Zusammenfassend lässt sich sagen, dass die verschiedenen Zieltypen in den folgenden Situationen verwendet werden sollten:
+
+* **Single**
+    Wenn eine private Kommunikation zwischen zwei Endpunkten erforderlich ist. Unterstützt mehrere Sprünge.
+* **Group**
+    Wenn eine private Kommunikation zwischen zwei oder mehreren Endpunkten erforderlich ist. Unterstützt mehrere Hops
+    indirekt, muss aber zunächst über ein *einziges* Ziel aufgebaut werden.
+* **Plain**
+    Wenn Klartextkommunikation erwünscht ist, z. B. bei der Übermittlung von Informationen oder für lokale Erkennungszwecke.
+
+Um mit einem *einzigen* Ziel zu kommunizieren, müssen Sie dessen öffentlichen Schlüssel kennen. Jede Methode zur
+um den öffentlichen Schlüssel zu erhalten, ist zulässig, aber Reticulum enthält einen einfachen Mechanismus, um anderen
+Knoten den öffentlichen Schlüssel Ihres Ziels mitzuteilen, genannt *announce*. Es ist auch möglich, einen
+Es ist auch möglich, einen unbekannten öffentlichen Schlüssel aus dem Netzwerk anzufordern, da alle Transportinstanzen als verteiltes Hauptbuch
+der öffentlichen Schlüssel dienen.
+
+Beachten Sie, dass Informationen über öffentliche Schlüssel auch auf andere Weise als mit der
+eingebauten *announce*-Funktionalität weitergegeben und verifiziert werden können, und dass es daher nicht erforderlich ist, die *announce*- und *path request*
+Funktionalität zu verwenden, um öffentliche Schlüssel zu erhalten. Es ist jedoch bei weitem die einfachste Methode und sollte auf jeden Fall verwendet werden
+wenn es keinen sehr guten Grund gibt, es anders zu machen.
+
+.. _understanding-keyannouncements:
+
+Öffentliche Schlüsselankündigungen
+------------------------
+
+Eine *Ankündigung* sendet ein spezielles Paket über alle relevanten Schnittstellen, das alle erforderlichen
+Informationen über den Ziel-Hash und den öffentlichen Schlüssel enthält, und kann auch einige zusätzliche,
+anwendungsspezifische Daten enthalten. Das gesamte Paket wird vom Absender signiert, um die Authentizität zu gewährleisten. Es ist nicht
+Es ist nicht erforderlich, die Ankündigungsfunktion zu verwenden, aber in vielen Fällen ist dies der einfachste Weg, um
+öffentlichen Schlüssel im Netz auszutauschen. Der announce-Mechanismus dient auch dazu, eine Ende-zu-Ende-Verbindung
+zum angekündigten Ziel, während sich die Ankündigung im Netz ausbreitet.
+
+Eine Ankündigung in einer einfachen Messenger-Anwendung könnte beispielsweise die folgenden Informationen enthalten:
+
+
+* Des Ansagers Ziel-Hashwert
+* Des Ansagers öffentlicher Schlüssel
+* Anwendungsspezifische Daten, in diesem Fall der Spitzname des Nutzers und sein Verfügbarkeitsstatus
+* Ein zufälliger blob, der jede neue Meldung einzigartig macht
+* Eine Ed25519-Unterschrift der oben genannten Informationen, die die Authentizität bestätigt
+
+Mit diesen Informationen ist jeder Reticulum-Knoten, der sie erhält, in der Lage, ein ausgehendes Ziel zu rekonstruieren
+Ziel rekonstruieren, um mit diesem Ziel sicher zu kommunizieren. Sie haben vielleicht bemerkt, dass eine Information fehlt
+Information fehlt, um das vollständige Wissen über das angekündigte Ziel zu rekonstruieren, und zwar die
+die Aspektnamen des Ziels. Diese werden absichtlich weggelassen, um Bandbreite zu sparen, da sie
+in fast allen Fällen implizit sein werden. Die empfangende Anwendung wird sie bereits kennen. Wenn ein Ziel
+Name nicht vollständig implizit ist, können Informationen in den anwendungsspezifischen Datenteil aufgenommen werden, die
+die es dem Empfänger ermöglichen, die Benennung abzuleiten.
+
+Es ist wichtig zu wissen, dass Ankündigungen im gesamten Netz nach einem bestimmten Muster weitergeleitet werden.
+bestimmten Muster weitergeleitet werden. Dies wird in dem Abschnitt
+:ref:`Der Announce-Mechanismus im Detail<understanding-announce>`.
+
+In Reticulum können sich die Ziele beliebig im Netz bewegen. Dies ist ein großer Unterschied zu
+Protokollen wie IP, bei denen eine Adresse immer innerhalb des Netzwerksegments bleiben muss, in dem sie zugewiesen wurde.
+Diese Einschränkung gibt es bei Reticulum nicht, und jedes Ziel ist *völlig portabel* über die gesamte Topographie
+des Netzwerks und *kann sogar in andere Reticulum-Netzwerke* als das, in dem es erstellt wurde, verlegt werden und
+immer noch erreichbar sein. Um seine Erreichbarkeit zu aktualisieren, muss ein Ziel lediglich eine Ankündigung an alle
+Netzwerken, zu denen es gehört. Nach kurzer Zeit ist es dann in diesem Netz global erreichbar.
+
+Die Tatsache, dass *einzelne* Ziele immer an ein Paar privater/öffentlicher Schlüssel gebunden sind, führt uns zum nächsten Thema.
+
+.. _understanding-identities:
+
+Identitäten
+----------
+
+In Reticulum stellt eine *Identität* nicht unbedingt eine persönliche Identität dar, sondern ist eine Abstraktion, die
+jede Art von *überprüfbarer Entität* darstellen kann. Das kann sehr wohl eine Person sein, aber auch die
+Steuerungsschnittstelle einer Maschine, ein Programm, ein Roboter, ein Computer, ein Sensor oder etwas ganz anderes sein. Unter
+Im Allgemeinen kann jede Art von Agent, der handeln kann oder auf den eingewirkt werden kann oder der Informationen speichern oder manipulieren kann, als
+als eine Identität dargestellt werden. Eine *Identität* kann verwendet werden, um eine beliebige Anzahl von Zielen zu erstellen.
+
+Ein *einzelnes* Ziel hat immer eine *Identität*, aber nicht *einfache* oder *Gruppen*.
+Ziele. Ziele und Identitäten haben eine mehrseitige Verbindung. Sie können ein
+Ziel erstellen, und wenn es bei der Erstellung nicht mit einer Identität verbunden ist, wird einfach eine neue Identität erstellt, die
+automatisch. Dies kann in manchen Situationen wünschenswert sein, aber oft werden Sie wahrscheinlich zuerst die Identität erstellen wollen
+Identität zu erstellen und diese dann zum Erstellen neuer Ziele zu verwenden.
+
+Als Beispiel könnte man eine Identität verwenden, um den Benutzer einer Messaging-Anwendung zu repräsentieren.
+Mit dieser Identität können dann Ziele erstellt werden, damit die Kommunikation den Benutzer erreicht.
+In allen Fällen ist es von großer Bedeutung, die privaten Schlüssel, die mit einer
+Reticulum-Identität zugehörigen privaten Schlüssel sicher und vertraulich zu speichern, da der Zugriff auf die Identitätsschlüssel gleichbedeutend ist mit
+Zugang zu den Identitätsschlüsseln ist gleichbedeutend mit dem Zugang und der Kontrolle der Erreichbarkeit von Zielen, die mit dieser Identität erstellt wurden.
+
+.. _understanding-gettingfurther:
+
+Weiter kommen
+---------------
+
+Die oben genannten Funktionen und Prinzipien bilden den Kern von Reticulum und würden ausreichen, um
+funktionale vernetzte Anwendungen in lokalen Clustern zu schaffen, zum Beispiel über Funkverbindungen, bei denen sich alle interessierten
+Knoten sich gegenseitig direkt hören können. Aber um wirklich nützlich zu sein, brauchen wir eine Möglichkeit, den Verkehr über mehrere
+Sprünge im Netzwerk zu leiten.
+
+In den folgenden Abschnitten werden zwei Konzepte vorgestellt, die dies ermöglichen: *Pfade* und *Links*.
+
+.. _understanding-transport:
+
+Reticulum Transport
+===================
+
+Die in herkömmlichen Netzen verwendeten Routing-Methoden sind grundsätzlich nicht mit den physikalischen Medientypen
+und den Gegebenheiten, für die Reticulum entwickelt wurde. Diese Mechanismen setzen meist Vertrauen auf der physikalischen Ebene voraus,
+und benötigen oft eine viel größere Bandbreite, als Reticulum als verfügbar voraussetzen kann. Da Reticulum so konzipiert ist, dass es
+Da Reticulum für den Betrieb über ein offenes Funkspektrum ausgelegt ist, kann ein solches Vertrauen nicht vorausgesetzt werden, und die Bandbreite ist oft sehr begrenzt.
+
+Um solche Herausforderungen zu meistern, verwendet das *Transport*-System von Reticulum asymmetrische Elliptische-Kurven-Kryptographie, um
+um das Konzept der *Pfade* zu implementieren, die es ermöglichen, herauszufinden, wie man Informationen näher an ein bestimmtes
+Ziel gelangen. Es ist wichtig zu wissen, dass kein einzelner Knoten in einem Reticulum-Netzwerk den vollständigen
+Pfad zu einem Ziel kennt. Jeder Transportknoten, der an einem Reticulum-Netzwerk teilnimmt, kennt nur
+kennt nur den direktesten Weg, um ein Paket einen Schritt näher an sein Ziel zu bringen.
+
+
+.. _understanding-nodetypes:
+
+Knoten Typen
+----------
+
+Derzeit unterscheidet Reticulum zwischen zwei Arten von Netzwerkknoten. Alle Knoten in einem Reticulum-Netzwerk
+sind *Reticulum-Instanzen*, und einige sind auch *Transportknoten*. Wenn ein System, auf dem Reticulum läuft, fest an einem
+an einem Ort fixiert ist und die meiste Zeit über verfügbar sein soll, ist es ein guter Kandidat für einen *Transportknoten*.
+
+Jede Reticulum-Instanz kann ein Transportknoten werden, indem sie in der Konfiguration aktiviert wird.
+Diese Unterscheidung wird vom Benutzer vorgenommen, der den Knoten konfiguriert, und dient dazu, festzulegen, welche Knoten im
+Netzwerk zur Weiterleitung des Datenverkehrs beitragen und welche Knoten für eine breitere Konnektivität auf andere Knoten angewiesen sind.
+
+Wenn ein Knoten eine *Instanz* ist, sollte ihm die Konfigurationsanweisung ``enable_transport = No`` gegeben werden, was
+ist die Standardeinstellung.
+
+Wenn es sich um einen *Transportknoten* handelt, sollte er die Konfigurationsanweisung ``enable_transport = Yes`` erhalten.
+
+
+.. _understanding-announce:
+
+Der Ankündigungsmechanismus im Detail
+--------------------------------
+
+Wenn eine *Ankündigung* für ein Ziel von einer Reticulum-Instanz gesendet wird, wird sie von jedem
+jedem Transportknoten weitergeleitet, der sie empfängt, allerdings nach bestimmten Regeln:
+
+
+* | Wenn Sie genau diese Meldung schon einmal erhalten haben, ignorieren Sie sie.
+
+* | Falls nicht, tragen Sie in eine Tabelle ein, von welchem Transportknoten die Meldung empfangen wurde und wie oft sie insgesamt
+    sie insgesamt weitergesendet wurde, um hierher zu gelangen.
+
+* | Wurde die Ankündigung *m+1* Mal wiederholt, wird sie nicht mehr weitergeleitet. Standardmäßig ist *m* auf
+    auf 128 gesetzt.
+
+* | Nach einer zufälligen Verzögerung wird die Ankündigung auf allen Schnittstellen, die über Bandbreite für die Verarbeitung von Ankündigungen verfügen, erneut übertragen.
+    für die Verarbeitung von Ankündigungen zur Verfügung steht. Standardmäßig ist die maximale Bandbreitenzuweisung für die Verarbeitung von
+    Ankündigungen auf 2 % festgelegt, kann aber für jede Schnittstelle einzeln konfiguriert werden.
+
+* | Wenn eine bestimmte Schnittstelle nicht genügend Bandbreite für die erneute Übertragung der Ankündigung zur Verfügung hat,
+    wird der Ankündigung eine Priorität zugewiesen, die umgekehrt proportional zur Anzahl der Sprünge ist, und sie wird
+    in eine von der Schnittstelle verwaltete Warteschlange eingefügt.
+
+* | Wenn die Schnittstelle Bandbreite für die Verarbeitung einer Ankündigung zur Verfügung hat, priorisiert sie Ankündigungen
+    für Ziele, die in Bezug auf die Anzahl der Sprünge am nächsten liegen, und priorisiert damit die Erreichbarkeit und Konnektivität
+    lokaler Knoten, selbst in langsamen Netzen, die mit größeren und schnelleren Netzen verbunden sind.
+
+* | Nachdem die Ankündigung erneut gesendet wurde und wenn keine anderen Knoten die Ankündigung erneut senden
+    mit einem größeren Hopcount als beim Verlassen dieses Knotens, wird die Übertragung *r* Mal wiederholt. Standardmäßig,
+    ist *r* auf 1 gesetzt.
+
+* | Wenn eine neuere Ankündigung vom gleichen Ziel eintrifft, während eine identische Ankündigung bereits darauf wartet
+    darauf wartet, übertragen zu werden, wird die neueste Ankündigung verworfen. Enthält die neueste Ankündigung andere
+    anwendungsspezifische Daten enthält, wird sie die alte Ankündigung ersetzen.
+
+Sobald eine Ankündigung einen Knoten im Netz erreicht hat, kann jeder andere Knoten, der in direktem Kontakt mit diesem
+Knoten in direktem Kontakt mit diesem Knoten steht, kann das Ziel, von dem die Ankündigung ausging, erreichen, indem er einfach ein Paket
+das an dieses Ziel gerichtet ist. Jeder Knoten, der Kenntnis von der Ankündigung hat, kann das
+Paket zum Ziel leiten, indem er den nächsten Knoten mit der kürzesten Anzahl von Sprüngen zum Ziel sucht.
+Ziel.
+
+Nach diesen Regeln wird sich eine Ankündigung auf vorhersehbare Weise im gesamten Netz ausbreiten,
+und macht das angekündigte Ziel in kurzer Zeit erreichbar. Schnelle Netze, die über die
+Kapazität haben, viele Ankündigungen zu verarbeiten, können sehr schnell volle Konvergenz erreichen, auch wenn ständig neue Ziele hinzukommen.
+neue Ziele. Langsamere Segmente solcher Netze brauchen unter Umständen etwas länger, um vollständige Kenntnisse über
+über die breiten und schnellen Netze, mit denen sie verbunden sind, zu erlangen, können dies aber im Laufe der Zeit tun, wobei sie der vollständigen
+und schnell konvergierende Ende-zu-Ende-Konnektivität für ihre lokalen, langsameren Segmente.
+
+Im Allgemeinen konvergieren selbst extrem komplexe Netze, die die maximale Anzahl von 128 Sprüngen nutzen, in etwa einer Minute zur vollständigen
+Ende-zu-Ende-Konnektivität in etwa einer Minute, vorausgesetzt, es ist genügend Bandbreite vorhanden, um die
+die erforderliche Anzahl von Ankündigungen zu verarbeiten.
+
+.. _understanding-paths:
+
+Das Ziel erreichen
+------------------------
+
+In Netzen mit sich ändernder Topologie und vertrauensloser Konnektivität benötigen die Knoten eine Möglichkeit, eine
+*überprüfte Konnektivität* untereinander herzustellen. Da davon ausgegangen wird, dass das Netz nicht vertrauenswürdig ist, muss Reticulum
+eine Möglichkeit bieten, um zu garantieren, dass der Peer, mit dem Sie kommunizieren, tatsächlich der ist, den Sie erwarten.
+erwarten. Reticulum bietet zwei Möglichkeiten, dies zu tun.
+
+Für den Austausch kleinerer Datenmengen bietet Reticulum die API *Packet*, die genau so funktioniert, wie Sie es erwarten würden - auf der Ebene einzelner Pakete. Beim Senden eines Pakets wird der folgende Prozess angewendet:
+
+* | Ein Paket wird immer mit einem zugehörigen Ziel und einigen Nutzdaten erstellt. Wenn das Paket
+    an einen *einzigen* Zieltyp gesendet wird, erstellt Reticulum automatisch einen ephemeren Verschlüsselungsschlüssel, führt einen
+    einen ECDH-Schlüsselaustausch mit dem öffentlichen Schlüssel des Ziels und verschlüsselt die Daten.
+
+* | Es ist wichtig zu wissen, dass dieser Schlüsselaustausch keinen Netzverkehr erfordert. Der Absender kennt bereits
+    Absender kennt den öffentlichen Schlüssel des Ziels bereits aus einer zuvor empfangenen *Ankündigung* und kann daher den ECDH
+    Schlüsselaustausch lokal durchführen, bevor er das Paket sendet.
+
+* | Der öffentliche Teil des neu erzeugten ephemeren Schlüsselpaares wird dem verschlüsselten Token beigefügt und
+    zusammen mit den verschlüsselten Nutzdaten im Paket gesendet.
+
+* | Wenn das Ziel das Paket erhält, kann es selbst einen ECDH-Schlüsselaustausch durchführen und das Paket entschlüsseln.
+    Paket entschlüsseln.
+
+* | Für jedes auf diese Weise gesendete Paket wird ein neuer ephemerer Schlüssel verwendet.
+
+* | Sobald das Paket von dem adressierten Ziel empfangen und entschlüsselt wurde, kann dieses Ziel entscheiden
+    seinen Empfang des Pakets zu *beweisen*. Dazu berechnet es den SHA-256-Hash des empfangenen Pakets,
+    und diesen Hash mit seinem Ed25519-Signierschlüssel signiert. Die Transportknoten im Netz können dann diesen
+    *Beweis* zurück zum Ursprung des Pakets leiten, wo die Signatur anhand des bekannten öffentlichen
+    öffentlichen Signierschlüssel.
+
+* | Falls das Paket an einen *Gruppentyp* adressiert ist, wird das Paket mit dem
+    gemeinsamen AES-128-Schlüssel verschlüsselt, der mit dem Ziel verbunden ist. Falls das Paket an einen *plain* Zieltyp adressiert ist
+    Zieltyp adressiert ist, werden die Nutzdaten nicht verschlüsselt. Keiner dieser beiden Zieltypen kann eine
+    Vorwärtsgeheimnis bieten. Im Allgemeinen wird empfohlen, immer den *einzigen* Zieltyp zu verwenden, es sei denn, es ist
+    es nicht unbedingt notwendig ist, einen der anderen zu verwenden.
+
+
+Für den Austausch größerer Datenmengen oder wenn längere Sitzungen mit bidirektionaler Kommunikation gewünscht sind, bietet Reticulum die API *Link*. Um einen *Link* aufzubauen, wird folgender Prozess verwendet:
+
+* | Zunächst sendet der Knoten, der eine Verbindung herstellen möchte, ein spezielles Paket aus, das
+    das Netz durchläuft und das gewünschte Ziel ausfindig macht. Unterwegs nehmen die Transportknoten, die das Paket
+    Transportknoten, die das Paket weiterleiten, diese *Verbindungsanfrage* zur Kenntnis nehmen.
+
+* | Zweitens, wenn das Ziel die *Verbindungsanfrage* annimmt, sendet es ein Paket zurück, das die
+    Authentizität seiner Identität (und des Empfangs der Verbindungsanfrage) an den initiierenden Knoten zurück. Alle
+    Knoten, die das Paket ursprünglich weitergeleitet haben, sind ebenfalls in der Lage, diesen Beweis zu verifizieren und somit
+    die Gültigkeit der *Verbindung* im gesamten Netz akzeptieren.
+
+* | Wenn die Gültigkeit des *Links* von den Weiterleitungsknoten akzeptiert wurde, werden diese Knoten
+    die *Verknüpfung* gespeichert, und sie kann anschließend durch Verweis auf einen Hash, der sie repräsentiert, verwendet werden.
+
+* | Als Teil der *Link-Anforderung* findet ein Elliptic Curve Diffie-Hellman Schlüsselaustausch statt, der einen
+    effizient verschlüsselten Tunnel zwischen den beiden Knotenpunkten aufbaut. Daher wird diese Art der Kommunikation bevorzugt,
+    auch dann bevorzugt, wenn die Knoten direkt miteinander kommunizieren können, wenn die auszutauschende Datenmenge
+    auszutauschen sind, oder wenn die Nutzung der fortgeschrittenen API-Funktionen erwünscht ist.
+
+* | Wenn ein *Link* eingerichtet wurde, bietet er automatisch die Funktion des Nachrichtenempfangs durch
+    denselben *Proof*-Mechanismus wie zuvor, so dass der sendende Knoten eine verifizierte Bestätigung erhalten kann
+    dass die Informationen den vorgesehenen Empfänger erreicht haben.
+
+* | Sobald die *Verbindung* hergestellt ist, kann der Initiator anonym bleiben oder sich gegenüber dem
+    dem Ziel mit einer Reticulum-Identität zu authentifizieren. Diese Authentifizierung findet innerhalb der verschlüsselten Verbindung statt
+    Verbindung statt und wird nur dem verifizierten Ziel offenbart, nicht aber den Zwischenhändlern.
+
+In Kürze werden wir die Einzelheiten der Umsetzung dieser Methodik erörtern.
+aber lassen Sie uns zunächst rekapitulieren, welchen Zwecken diese Methodik dient. Wir
+stellen zunächst sicher, dass der Knoten, der auf unsere Anfrage antwortet, tatsächlich derjenige ist, mit dem wir kommunizieren wollen
+derjenige ist, mit dem wir kommunizieren wollen, und nicht ein böswilliger Akteur, der sich als solcher ausgibt.  Gleichzeitig
+Gleichzeitig bauen wir einen effizienten verschlüsselten Kanal auf. Der Aufbau dieses Kanals ist
+relativ kostengünstig in Bezug auf die Bandbreite, so dass er nur für einen kurzen
+Austausch verwendet und dann bei Bedarf neu aufgebaut werden, wobei auch die Verschlüsselungsschlüssel ausgetauscht werden.
+Die Verbindung kann auch über längere Zeiträume aufrechterhalten werden, wenn dies für die
+für die Anwendung geeignet ist. Das Verfahren fügt auch die *Link-ID* ein, einen Hash
+der aus dem Link-Request-Paket berechnet wird, in den Speicher der weiterleitenden Knoten ein,
+was bedeutet, dass die kommunizierenden Knoten einander danach einfach erreichen können
+unter Bezugnahme auf diese *Link-ID*.
+
+Die kombinierten Bandbreitenkosten für den Aufbau einer Verbindung betragen 3 Pakete mit insgesamt 297 Bytes (weitere Informationen im Abschnitt
+:ref:`Binäres Paketformat<understanding-packetformat>`). Die Menge an Bandbreite, die für das Offenhalten
+eine Verbindung offen zu halten, ist mit 0,45 Bits pro Sekunde praktisch vernachlässigbar. Selbst bei einem langsamen 1200-Bit-pro-Sekunde-Paket
+Funkkanal bleiben bei 100 gleichzeitigen Verbindungen immer noch 96 % der Kanalkapazität für die eigentlichen Daten übrig.
+
+
+Link Establishment im Detail
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Nach der Erläuterung der Grundlagen des Ankündigungsmechanismus, der Suche nach einem Pfad im Netz und einem Überblick über das
+des Verbindungsaufbaus wird in diesem Abschnitt der Reticulum-Verbindungsaufbau näher erläutert.
+Verbindungsaufbau.
+
+Die *Verbindung* in der Reticulum-Terminologie sollte nicht als direkte Verbindung von Knoten zu Knoten auf der
+physischen Schicht, sondern als abstrakter Kanal, der beliebig lange offen sein und eine beliebige Anzahl von
+eine beliebige Anzahl von Sprüngen umfassen kann, über die Informationen zwischen zwei Knoten ausgetauscht werden.
+
+
+* | Wenn ein Knoten im Netz eine verifizierte Verbindung mit einem anderen Knoten herstellen will, wird er
+    nach dem Zufallsprinzip ein neues Paar aus privatem und öffentlichem X25519-Schlüssel erzeugen. Anschließend erstellt er ein *Link Request*
+    Paket und sendet es.
+  |  
+  | *Es ist zu beachten, dass das oben erwähnte öffentliche/private X25519-Schlüsselpaar aus zwei getrennten Schlüsselpaaren besteht:
+    Ein Verschlüsselungsschlüsselpaar, das für die Ableitung eines gemeinsamen symmetrischen Schlüssels verwendet wird, und ein Signierschlüsselpaar, das
+    zum Signieren und Überprüfen von Nachrichten auf der Verbindung. Sie werden zusammen über die Leitung gesendet und können
+    der Einfachheit halber in dieser Erklärung als ein einziger öffentlicher Schlüssel betrachtet werden.
+
+* | Die *Link-Anfrage* ist an den Ziel-Hash des gewünschten Ziels gerichtet und
+    enthält die folgenden Daten: Den neu generierten öffentlichen X25519-Schlüssel *LKi*.
+
+* | Das gesendete Paket wird gemäß den zuvor festgelegten Regeln durch das Netz geleitet.
+    vorher festgelegt wurden.
+
+* | Jeder Knoten, der die Verbindungsanforderung weiterleitet, speichert eine *Link-ID* in seiner *Linktabelle*, zusammen mit der
+    Anzahl der Sprünge, die das Paket beim Empfang zurückgelegt hatte. Die Link-ID ist ein Hash des gesamten Link
+    Anfrage-Paketes. Wenn das Link-Request-Paket nicht innerhalb einer bestimmten Zeitspanne vom adressierten Ziel *bestätigt* wird, wird der
+    Zeitspanne vom adressierten Ziel nicht *bestätigt* wird, wird der Eintrag wieder aus der *Linktabelle* entfernt.
+
+* | Wenn das Ziel das Verbindungsanforderungspaket erhält, entscheidet es, ob es die Anforderung akzeptiert.
+    Wird sie angenommen, erzeugt das Ziel außerdem ein neues X25519-Schlüsselpaar (privat/öffentlich) und
+    führt einen Diffie-Hellman-Schlüsselaustausch durch, um einen neuen symmetrischen Schlüssel abzuleiten, der zur Verschlüsselung des
+    Kanal verschlüsselt wird, sobald dieser aufgebaut ist.
+
+* | Nun wird ein *link proof* Paket erstellt und über das Netz übertragen. Dieses Paket ist
+    an die *Link-ID* des *Links* adressiert. Es enthält die folgenden Daten: Den neu generierten X25519
+    öffentlichen Schlüssel *LKr* und eine Ed25519-Signatur der *Link-ID* und *LKr*, die mit dem *Original-Signierschlüssel* des
+    des adressierten Ziels.
+   
+* | Durch die Verifizierung dieses *Link-Proof*-Pakets können alle Knoten, die ursprünglich das *Link-Request*-Paket
+    Paket vom Absender zum Ziel transportiert haben, können nun überprüfen, ob das vorgesehene Ziel die
+    die Anfrage erhalten und akzeptiert hat, und dass der von ihnen gewählte Pfad für die Weiterleitung der Anfrage gültig war.
+    Wenn diese Überprüfung erfolgreich durchgeführt wurde, kennzeichnet der Transportknoten die Verbindung als aktiv.
+    Ein abstrakter bidirektionaler Kommunikationskanal wurde nun entlang eines Pfades im Netz eingerichtet.
+    Pakete können nun von beiden Enden der Verbindung bidirektional ausgetauscht werden, indem die Pakete an die *link id* adressiert werden.
+    Pakete an die *Link-ID* der Verbindung adressiert werden.
+
+* | Wenn die Quelle den *Nachweis* erhält, weiß sie eindeutig, dass ein verifizierter Pfad
+    zum Zielort hergestellt wurde. Sie kann nun auch den öffentlichen X25519-Schlüssel aus dem
+    *Link-Proof* enthaltenen öffentlichen X25519-Schlüssel verwenden, um seinen eigenen Diffie-Hellman-Schlüsselaustausch durchzuführen und den symmetrischen Schlüssel abzuleiten
+    der zur Verschlüsselung des Kanals verwendet wird. Informationen können nun zuverlässig und sicher ausgetauscht werden.
+
+
+Es ist wichtig zu wissen, dass diese Methode sicherstellt, dass die Quelle der Anfrage keine
+keine identifizierenden Informationen über sich selbst preisgeben muss. Der Initiator der Verbindung bleibt völlig anonym.
+
+Bei Verwendung von *Links* prüft Reticulum automatisch alle über die Verbindung gesendeten Daten und kann auch
+bei Verwendung von *Ressourcen* auch die erneute Übertragung automatisieren.
+
+.. _understanding-resources:
+
+Resourcen
+---------
+
+Für den Austausch kleiner Datenmengen über ein Reticulum-Netzwerk ist die Schnittstelle :ref:`Packet<api-packet>` ausreichend.
+ist ausreichend, aber für den Austausch von Daten, die viele Pakete erfordern, ist eine effiziente Methode zur Koordinierung
+die Übertragung zu koordinieren.
+
+Dies ist der Zweck des Reticulum :ref:`Resource<api-resource>`. Eine *Ressource* kann automatisch
+die zuverlässige Übertragung einer beliebigen Datenmenge über einen etablierten :ref:`Link<api-link>` übernehmen.
+Ressourcen können Daten automatisch komprimieren, werden die Daten in einzelne Pakete aufteilen, die Reihenfolge der
+der Übertragung, die Integritätsprüfung und das Wiederzusammensetzen der Daten auf der anderen Seite.
+
+:ref:`Resources<api-resource>` sind programmatisch sehr einfach zu verwenden und erfordern nur wenige Zeilen
+Codes, um zuverlässig jede beliebige Menge an Daten zu übertragen. Sie können verwendet werden, um im Speicher gespeicherte Daten zu übertragen,
+oder Daten direkt aus Dateien übertragen.
+
+.. _understanding-referencesystem:
+
+Reference Setup
+======================
+
+In diesem Abschnitt wird ein empfohlenes *Referenz-Setup* für Reticulum beschrieben. Es ist wichtig zu
+zu beachten, dass Reticulum so konzipiert ist, dass es auf mehr oder weniger jedem Computer und über mehr oder weniger jedes
+mehr oder weniger jedes Medium, das das Senden und Empfangen von Daten ermöglicht und einige sehr geringe
+Mindestanforderungen erfüllt.
+
+Der Kommunikationskanal muss mindestens Halbduplexbetrieb unterstützen und einen durchschnittlichen
+Durchsatz von etwa 500 Bit pro Sekunde bieten und eine MTU der physikalischen Schicht von 500 Byte unterstützen. Der
+Reticulum-Stack sollte auf mehr oder weniger jeder Hardware laufen können, die eine Python 3.x 
+Laufzeitumgebung bietet.
+
+Dennoch wurde dieses Referenz-Setup entworfen, um eine gemeinsame Plattform für alle zu schaffen
+die bei der Entwicklung von Reticulum mithelfen wollen, und für alle, die eine
+empfohlenen Setup für den Einstieg ins Experimentieren. Ein Referenzsystem besteht aus drei Teilen:
+
+* **Ein Schnittstellengerät**
+    das den Zugang zu dem physikalischen Medium ermöglicht, über das die Kommunikation
+    stattfindet, zum Beispiel ein Funkgerät mit integriertem Modem. Eine Einrichtung mit einem separaten Modem
+    das an ein Funkgerät angeschlossen ist, wäre ebenfalls ein Schnittstellengerät.
+* **Ein Host-Gerät**
+    Eine Art Computergerät, auf dem die erforderliche Software ausgeführt werden kann, das mit dem
+    Schnittstellengerät kommuniziert und die Benutzerinteraktion ermöglicht.
+* **Ein Software-Stack**
+    Die Software zur Implementierung des Reticulum-Protokolls und die Anwendungen, die es verwenden.
+
+Die Referenzeinrichtung kann als relativ stabile Plattform für die Entwicklung und den Aufbau von
+Netzwerke oder Anwendungen aufzubauen. Auch wenn sich die Details der Implementierung im derzeitigen Entwicklungsstadium noch ändern können
+der Entwicklung ändern können, ist es das Ziel, die Hardwarekompatibilität so lange wie möglich aufrechtzuerhalten, und
+Die derzeitige Referenzkonfiguration soll eine funktionale Plattform für viele Jahre
+in die Zukunft. Das derzeitige Referenzsystem ist wie folgt aufgebaut:
+
+
+* **Schnittstelle Gerät**
+    Ein Datenfunkgerät, bestehend aus einem LoRa-Funkmodul und einem Mikrocontroller mit Open Source
+    Firmware, die über USB mit Host-Geräten verbunden werden kann. Es arbeitet entweder in den Frequenzbändern 430, 868 oder 900
+    MHz-Frequenzband. Weitere Einzelheiten finden Sie auf der `RNode Page <https://unsigned.io/rnode>`_.
+* **Host-Gerät**
+    Jedes Computergerät, auf dem Linux und Python laufen. Ein Raspberry Pi mit einem Debian-basierten Betriebssystem wird
+    empfohlen.
+* **Software-Stapel**
+    Die zuletzt veröffentlichte Python-Implementierung von Reticulum, die auf einem Debian-basierten
+    Betriebssystem.
+
+Um Verwirrung zu vermeiden, ist es sehr wichtig zu beachten, dass das Referenz-Schnittstellengerät **nicht** den LoRaWAN-Standard
+den LoRaWAN-Standard verwendet, sondern eine eigene MAC-Schicht auf der einfachen LoRa-Modulation aufbaut! Daher benötigen Sie
+Sie benötigen daher ein einfaches LoRa-Funkmodul, das an einen Controller mit der richtigen Firmware angeschlossen ist. Ausführliche Informationen darüber, wie man
+wie man ein solches Gerät erhält oder herstellt, finden Sie auf der `RNode Page <https://unsigned.io/rnode>`_.
+
+Mit dem aktuellen Referenz-Setup sollte es möglich sein, für etwa 100$ in ein Reticulum-Netzwerk einzusteigen
+einsteigen, selbst wenn Sie noch keine Hardware haben und alles neu kaufen müssen.
+
+Dieses Referenz-Setup ist natürlich nur eine Empfehlung für einen einfachen Einstieg, und Sie sollten es
+Sie sollten sie an Ihre eigenen Bedürfnisse oder an die Ihnen zur Verfügung stehende Hardware anpassen.
+
+.. _understanding-protocolspecifics:
+
+Besonderheiten des Protokolls
+==================
+
+In diesem Kapitel werden protokollspezifische Informationen erläutert, die für die Implementierung von
+Reticulum wichtig sind, aber nicht entscheidend für das Verständnis der Funktionsweise des Protokolls im Allgemeinen. Es sollte
+eher als Referenz denn als Pflichtlektüre betrachtet werden.
+
+
+Paket Priorisierung
+---------------------
+
+Derzeit ist Reticulum in Bezug auf den allgemeinen Verkehr völlig prioritätsunabhängig. Der gesamte Verkehr wird
+nach dem Prinzip "Wer zuerst kommt, mahlt zuerst". Wiederholungsmeldungen werden gemäß den in diesem Kapitel beschriebenen Wiederholungs
+Zeiten und Prioritäten behandelt, die weiter oben in diesem Kapitel beschrieben wurden.
+
+
+Schnittstellen Zugriffscodes
+----------------------
+
+Reticulum kann benannte virtuelle Netze und Netze erstellen, auf die nur durch die Kenntnis einer freigegebenen
+Passphrase zugänglich sind. Die entsprechende Konfiguration wird im Abschnitt :ref:`Gemeinsame Schnittstellenoptionen<interfaces-options>`
+Abschnitt beschrieben. Um diese Funktion zu implementieren, verwendet Reticulum das Konzept der Interface Access Codes, die pro Paket berechnet
+und pro Paket verifiziert werden.
+
+Eine Schnittstelle mit einem benannten virtuellen Netzwerk oder aktivierter Passphrase-Authentifizierung leitet eine gemeinsame Ed25519
+Signieridentität ab und erzeugt für jedes ausgehende Paket eine Signatur des gesamten Pakets. Diese Signatur wird
+wird dann vor der Übertragung als Interface Access Code in das Paket eingefügt. Abhängig von der Geschwindigkeit und den
+Fähigkeiten der Schnittstelle kann der IFAC die volle 512-Bit-Ed25519-Signatur oder eine verkürzte Version sein.
+Die konfigurierte IFAC-Länge kann für alle Schnittstellen mit dem Dienstprogramm ``rnstatus`` überprüft werden.
+
+Beim Empfang prüft die Schnittstelle, ob die Signatur mit dem erwarteten Wert übereinstimmt, und verwirft das Paket, wenn dies nicht der Fall ist.
+nicht übereinstimmt. Auf diese Weise wird sichergestellt, dass nur Pakete, die mit den richtigen Namens- und/oder Passphrase-Parametern gesendet werden, das Netz
+in das Netzwerk gelangen.
+
+
+.. _understanding-packetformat:
+
+Wire Format
+-----------
+
+.. code-block:: text
+
+    == Reticulum Wire Format ======
+
+    Ein Reticulum-Paket besteht aus den folgenden Feldern:
+
+    [HEADER 2 bytes] [ADDRESSES 16/32 bytes] [CONTEXT 1 byte] [DATA 0-465 bytes]
+
+    * The HEADER field is 2 bytes long.
+      * Byte 1: [IFAC Flag], [Header Type], [Propagation Type], [Destination Type] and [Packet Type]
+      * Byte 2: Number of hops
+
+    * Interface Access Code field if the IFAC flag was set.
+      * The length of the Interface Access Code can vary from
+        1 to 64 bytes according to physical interface
+        capabilities and configuration.
+
+    * The ADDRESSES field contains either 1 or 2 addresses.
+      * Each address is 16 bytes long.
+      * The Header Type flag in the HEADER field determines
+        whether the ADDRESSES field contains 1 or 2 addresses.
+      * Addresses are SHA-256 hashes truncated to 16 bytes.
+
+    * The CONTEXT field is 1 byte.
+      * It is used by Reticulum to determine packet context.
+
+    * The DATA field is between 0 and 465 bytes.
+      * It contains the packets data payload.
+
+       IFAC Flag
+    -----------------
+    open             0  Packet for publically accessible interface
+    authenticated    1  Interface authentication is included in packet
+
+
+    Header Types
+    -----------------
+    type 1           0  Two byte header, one 16 byte address field
+    type 2           1  Two byte header, two 16 byte address fields
+
+
+    Propagation Types
+    -----------------
+    broadcast       00
+    transport       01
+    reserved        10
+    reserved        11
+
+
+    Destination Types
+    -----------------
+    single          00
+    group           01
+    plain           10
+    link            11
+
+
+    Packet Types
+    -----------------
+    data            00
+    announce        01
+    link request    10
+    proof           11
+
+
+    +- Packet Example -+
+
+       HEADER FIELD           DESTINATION FIELDS            CONTEXT FIELD  DATA FIELD
+     _______|_______   ________________|________________   ________|______   __|_
+    |               | |                                 | |               | |    |
+    01010000 00000100 [HASH1, 16 bytes] [HASH2, 16 bytes] [CONTEXT, 1 byte] [DATA]
+    || | | |    |
+    || | | |    +-- Hops             = 4
+    || | | +------- Packet Type      = DATA
+    || | +--------- Destination Type = SINGLE
+    || +----------- Propagation Type = TRANSPORT
+    |+------------- Header Type      = HEADER_2 (two byte header, two address fields)
+    +-------------- Access Codes     = DISABLED
+
+
+    +- Packet Example -+
+
+       HEADER FIELD   DESTINATION FIELD   CONTEXT FIELD  DATA FIELD
+     _______|_______   _______|_______   ________|______   __|_
+    |               | |               | |               | |    |
+    00000000 00000111 [HASH1, 16 bytes] [CONTEXT, 1 byte] [DATA]
+    || | | |    |
+    || | | |    +-- Hops             = 7
+    || | | +------- Packet Type      = DATA
+    || | +--------- Destination Type = SINGLE
+    || +----------- Propagation Type = BROADCAST
+    |+------------- Header Type      = HEADER_1 (two byte header, one address field)
+    +-------------- Access Codes     = DISABLED
+
+
+    +- Packet Example -+
+
+       HEADER FIELD     IFAC FIELD    DESTINATION FIELD   CONTEXT FIELD  DATA FIELD
+     _______|_______   ______|______   _______|_______   ________|______   __|_
+    |               | |             | |               | |               | |    |
+    10000000 00000111 [IFAC, N bytes] [HASH1, 16 bytes] [CONTEXT, 1 byte] [DATA]
+    || | | |    |
+    || | | |    +-- Hops             = 7
+    || | | +------- Packet Type      = DATA
+    || | +--------- Destination Type = SINGLE
+    || +----------- Propagation Type = BROADCAST
+    |+------------- Header Type      = HEADER_1 (two byte header, one address field)
+    +-------------- Access Codes     = ENABLED
+
+
+    Size examples of different packet types
+    ---------------------------------------
+
+    The following table lists example sizes of various
+    packet types. The size listed are the complete on-
+    wire size counting all fields including headers,
+    but excluding any interface access codes.
+
+    - Path Request    :    51  bytes
+    - Announce        :    167 bytes
+    - Link Request    :    83  bytes
+    - Link Proof      :    115 bytes
+    - Link RTT packet :    99  bytes
+    - Link keepalive  :    20  bytes
+
+
+.. _understanding-primitives:
+
+Kryptographische Primitiven
+------------------------
+
+Reticulum wurde entwickelt, um eine einfache Reihe von effizienten, starken und modernen
+kryptographischen Primitiven mit weithin verfügbaren Implementierungen zu verwenden, die
+sowohl auf Universal-CPUs als auch auf Mikrocontrollern verwendet werden können. Die erforderlichen Primitive sind:
+
+* Ed25519 für Signaturen
+
+* X22519 für ECDH Schlüssel Tausch
+
+* HKDF für Schlüssel Ableitung
+
+* Fernet für verschlüsselte Token
+
+  * AES-128 im CBC Modus
+
+  * HMAC für die Nachrichten Authentifizierung
+
+* SHA-256
+
+* SHA-512
+
+In der Standardkonfiguration der Installation werden die ``X25519``, ``Ed25519`` und ``AES-128-CBC``
+Primitive werden von `OpenSSL <https://www.openssl.org/>`_ bereitgestellt (über das `PyCA/cryptography <https://github.com/pyca/cryptography>`_
+Paket). Die Hashing-Funktionen ``SHA-256`` und ``SHA-512`` werden von der Standard
+Python `hashlib <https://docs.python.org/3/library/hashlib.html>`_ bereitgestellt. Die ``HKDF``, ``HMAC``,
+``Fernet``-Primitive und die ``PKCS7``-Padding-Funktion werden immer von den
+folgenden internen Implementierungen bereitgestellt:
+
+- ``RNS/Cryptography/HKDF.py``
+- ``RNS/Cryptography/HMAC.py``
+- ``RNS/Cryptography/Fernet.py``
+- ``RNS/Cryptography/PKCS7.py``
+
+
+Reticulum enthält außerdem eine vollständige Implementierung aller erforderlichen Primitive in reinem Python.
+Wenn OpenSSL und PyCA beim Start von Reticulum nicht auf dem System verfügbar sind, verwendet Reticulum
+stattdessen die internen reinen Python-Primitive. Eine triviale Folge hiervon ist die Leistung,
+da das OpenSSL-Backend *viel* schneller ist. Die wichtigste Folge ist jedoch der
+potenzielle Einbuße an Sicherheit durch die Verwendung von Primitiven, die nicht so gründlich geprüft wurden wie die von OpenSSL,
+getestet und geprüft wurden wie die von OpenSSL.
+
+Wenn Sie die internen reinen Python-Primitive verwenden möchten, ist es **sehr ratsam**, dass Sie
+die damit verbundenen Risiken kennen und eine fundierte Entscheidung darüber treffen, ob diese Risiken
+diese Risiken für Sie akzeptabel sind.
