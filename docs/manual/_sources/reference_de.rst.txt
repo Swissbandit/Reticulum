@@ -6,7 +6,11 @@
 API Referenz
 *************
 Die Kommunikation über Reticulum-Netzwerke erfolgt mit Hilfe einer einfachen Reihe von Klassen, die von der RNS-API bereitgestellt werden.
-In diesem Kapitel werden alle von der Reticulum Network Stack API bereitgestellten Klassen mit ihren Methodensignaturen und ihrer Verwendung aufgeführt und erläutert. Es kann als Referenz beim Schreiben von Anwendungen, die Reticulum nutzen, verwendet werden oder als Ganzes gelesen werden, um ein Verständnis für die gesamte Funktionalität von RNS aus der Sicht des Entwicklers zu erhalten.
+In diesem Kapitel werden alle von der Reticulum Network Stack API bereitgestellten Klassen 
+mit ihren Methodensignaturen und ihrer Verwendung aufgeführt und erläutert. 
+Es kann als Referenz beim Schreiben von Anwendungen, die Reticulum nutzen, 
+verwendet werden oder als Ganzes gelesen werden, um ein Verständnis für die gesamte Funktionalität 
+von RNS aus der Sicht des Entwicklers zu erhalten.
 
 .. _api-reticulum:
 
