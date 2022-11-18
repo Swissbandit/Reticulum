@@ -38,5 +38,5 @@ und Daher verlassen wir uns auf das altmodische menschliche Feedback.
 
 Code beisteuern
 ===============
-Treten Sie dem GitHub-Repository `_<https://github.com/markqvist/reticulum>`_ bei, um
+Treten Sie dem GitHub-Repository <https://github.com/markqvist/reticulum>`_ bei, um
 Probleme zu melden, Funktionen vorzuschlagen und Code zu Reticulum beizutragen.
