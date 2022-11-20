@@ -819,13 +819,12 @@ Die folgende Tabelle veranschaulicht die Regeln für die automatische Weitergabe
 von einem Schnittstellentyp zu einem anderen, für alle möglichen Kombinationen. 
 Für den Zweck der Weitergabe von Ankündigungen sind die Modi *Full* und *Gateway* identisch.
 
-.. image:: graphics/if_mode_graph_b.png
+
 
 Siehe den Abschnitt :ref:`Schnittstellenmodi<interfaces-modes>` für einen konzeptionellen Überblick
 über die verschiedenen Schnittstellenmodi und wie sie konfiguriert werden.
 
-.. 
-      (.. code-block:: text)
+.. code-block:: text
       Full ────── ✓ ──┐              ┌── ✓ ── Full
       AP ──────── ✓ ──┼───> Full >───┼── ✕ ── AP
       Boundary ── ✓ ──┤              ├── ✓ ── Boundary
