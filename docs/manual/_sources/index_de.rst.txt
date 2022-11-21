@@ -7,7 +7,7 @@ um an der Entwicklung von Reticulum selbst mitzuwirken.
 
 .. only:: html
 
-   Table Of Contents
+   Inhaltsverzeichnis
    =================
 
 .. toctree::
@@ -31,7 +31,7 @@ um an der Entwicklung von Reticulum selbst mitzuwirken.
 
 .. only:: html
 
-   Indices and Tables
+   Indizes und Tabellen
    ==================
 
    * :ref:`genindex`
