@@ -1,0 +1,167 @@
+.. _networks-main:
+
+*****************
+Aufbau von Netzwerken
+*****************
+
+Dieses Kapitel vermittelt Ihnen das nötige Wissen, um Netzwerke mit Reticulum aufzubauen, 
+was einfacher ist als die Verwendung traditioneller Stacks, da Sie sich nicht um die Koordination 
+von Adressen, Subnetzen und Routing für ein Netzwerk zu kümmern brauchen, 
+von dem Sie nicht wissen, wie es sich in Zukunft entwickeln wird. 
+Mit Reticulum können Sie einfach weitere Segmente zu Ihrem Netzwerk hinzufügen, 
+und Reticulum kümmert sich automatisch um die Konvergenz des gesamten Netzwerks.
+
+Konzepte und Überblick
+--------------------
+
+Es gibt wichtige Punkte, die beim Aufbau von Netzwerken mit Reticulum zu beachten sind:
+
+ * | In einem Reticulum-Netzwerk kann jeder Knoten selbständig so viele Adressen
+     (in der Reticulum-Terminologie *Destinationen* genannt) generieren, 
+     die dann global für den Rest des Netzes erreichbar sind. 
+     Es gibt keinen zentralen Punkt der Kontrolle über den Adressraum.
+
+ * | Reticulum wurde sowohl für sehr kleine als auch für sehr große Netze konzipiert.
+     Während der Adressraum Milliarden von Endpunkten unterstützen kann, 
+     ist Reticulum auch sehr nützlich, 
+     wenn nur einige wenige Geräte miteinander kommunizieren müssen.
+
+ * | Netze mit geringer Bandbreite, wie LoRa und Paketfunk, können problemlos mit
+     mit viel größeren Netzwerken mit höherer Bandbreite zusammenarbeiten und diese miteinander verbinden.
+     Reticulum verwaltet automatisch den Informationsfluss zu und von verschiedenen Netzwerksegmenten.
+     Wenn die Bandbreite begrenzt ist, wird der lokale Verkehr priorisiert.
+
+ * | Reticulum bietet standardmäßig die Anonymität des Absenders/Initiators. 
+     Es gibt keine Möglichkeit Verkehr zu filtern oder nach der Quelle des Verkehrs zu unterscheiden.
+
+ * | Der gesamte Verkehr wird mit ephemeren Schlüsseln verschlüsselt, 
+     durch einen Elliptic Curve Diffie-Hellman-Schlüsselaustausch auf Curve25519.
+     Es gibt keine Möglichkeit, den Inhalt des Datenverkehrs zu überprüfen, und keine Möglichkeit, 
+     bestimmte Arten von Datenverkehr zu priorisieren oder zu drosseln.
+     Alle Transport- und Routing-Schichten sind daher völlig unabhängig von der Art des Datenverkehrs,
+     und lassen allen Verkehr gleichermaßen durch.
+
+ * | Das Reticulum kann sowohl mit als auch ohne Infrastruktur funktionieren. 
+     Wenn *Transport Knoten* verfügbar sind, können sie den Verkehr über mehrere Hops für andere
+     Knoten weiterleiten und als verteilter kryptografischer Schlüsselspeicher fungieren. 
+     Wenn keine Transportknoten verfügbar sind, können alle Knoten, die sich in Kommunikationsreichweite befinden
+     trotzdem direkt miteinander kommunizieren.
+
+ * | Jeder Knoten kann ein Transportknoten werden, indem dies in seiner Konfiguration aktiviert wird, 
+     aber es ist nicht notwendig, dass jeder Knoten im Netz ein Transportknoten ist. 
+     Wenn jeder Knoten ein Transportknoten ist, wird dies in den meisten Fällen
+     die Leistung und Zuverlässigkeit des Netzes verschlechtern.
+
+     *Generell gilt, dass ein Knoten, der stationär und gut angebunden ist und die meiste Zeit in Betrieb bleibt,
+     ein guter Kandidat für einen Transportknoten wäre. 
+     Für eine optimale Leistung sollte ein Netz die Anzahl von Transportknoten enthalten, 
+     die Konnektivität mit dem beabsichtigten Gebiet / der beabsichtigten Topografie bietet, 
+     und nicht viel mehr als diese.*
+
+ * | Reticulum ist so konzipiert, dass es in offenen, vertrauenslosen Umgebungen zuverlässig funktioniert. 
+     Das bedeutet, dass Sie damit offen zugängliche Netzwerke schaffen können, bei denen die Teilnehmer frei 
+     und unorganisiert ein- und austreten können. 
+     Diese Eigenschaft ermöglicht eine völlig neue und bisher weitgehend unerforschte Klasse von vernetzten Anwendungen,
+     bei denen sich Netze und der Informationsfluss in ihnen organisch bilden und auflösen können.
+
+ * | Sie können ebenso einfach geschlossene Netzwerke erstellen, da Reticulum die Möglichkeit bietet
+     Authentifizierung zu jeder Schnittstelle hinzufügen zu können. 
+     Das heißt, Sie können den Zugriff auf beliebige Schnittstellen beschränken, 
+     selbst wenn Sie ältere Geräte wie z. B. Modems verwenden.
+     Sie können auch authentifizierte und offene Schnittstellen auf demselben System mischen. 
+     Siehe die :ref:`Gemeinsame Schnittstellenoptionen<interfaces-options>` im Abschnitt :ref:`Interfaces<interfaces-main>`
+     Kapitels dieses Handbuchs für Informationen darüber, wie man die Schnittstellenauthentifizierung einrichtet.
+
+
+Mit Reticulum können Sie sehr unterschiedliche Arten von Netzwerkmedien in einem
+Mesh zu mischen oder alles innerhalb eines Mediums zu halten. Sie können ein "virtuelles
+Netzwerk" aufbauen, das vollständig über das Internet läuft und in dem alle Knoten über TCP
+und UDP-"Kanäle" kommunizieren. Man könnte ein solches Netz auch unter Verwendung anderer bereits etablierter
+Kommunikationskanäle als Trägermedium für Reticulum verwenden.
+
+Die meisten realen Netze werden jedoch wahrscheinlich entweder eine Form von
+drahtlose oder direkte Festnetzkommunikation. Um Reticulum die Kommunikation über
+ein beliebiges Medium zu kommunizieren, müssen Sie dies in der Konfigurationsdatei angeben, 
+die befindet sich standardmäßig unter ``~/.reticulum/config``. 
+Beispiele für die Konfiguration von Schnittstellen finden Sie im Kapitel :ref:`Unterstützte Schnittstellen<interfaces-main>`
+des Handbuchs.
+
+Es können beliebig viele Schnittstellen konfiguriert werden, und Reticulum entscheidet automatisch,
+welche in einer bestimmten Situation verwendet werden können, je nachdem, wohin der Verkehr fließen muss.
+
+Beispiel Szenarien
+-----------------
+
+Dieser Abschnitt veranschaulicht einige Beispielszenarien und wie sie im Allgemeinen
+geplant, umgesetzt und konfiguriert werden.
+
+Zusammengeschaltete LoRa-Standorte
+=========================
+
+Eine Organisation möchte ihren Mitgliedern, die hauptsächlich in drei verschiedenen Bereichen angesiedelt sind, 
+Kommunikations- und Informationsdienste anbieten.
+Drei geeignete Standorte auf einem Hügel wurden gefunden, an denen die Organisation Geräte installieren kann: Standort A, B und C.
+
+Da die Datenmenge, die zwischen den Nutzern ausgetauscht werden muss, klein ist, 
+sind die Anforderungen an die Bandbreite gering, und es werden LoRa-Funkgeräte gewählt, 
+um die Benutzer mit dem Netzwerk zu verbinden.
+
+Aufgrund der Lage auf einer Anhöhe besteht zwischen den Standorten A und B sowie zwischen B und C eine Funkreichweite.
+Aus diesem Grund muss die Organisation nicht das Internet zur Verbindung der Standorte zu nutzen, 
+sondern kauft vier Punkt-zu-Punkt WiFi-basierte Funkgeräte für die Verbindung der Standorte.
+
+An jedem Standort wird ein Raspberry Pi installiert, der als Gateway fungiert. 
+Ein LoRa-Funkgerät ist über ein USB-Kabel mit dem Pi verbunden, und das WiFi-Funkgerät ist an den
+Ethernet-Anschluss des Pi angeschlossen. Am Standort B werden zwei WiFi-Funkgeräte benötigt, um sowohl
+A und C zu erreichen, daher wird hier ein zusätzlicher Ethernet-Adapter an den Pi angeschlossen.
+
+Sobald die Hardware installiert ist, wird Reticulum auf allen Pis installiert.
+Standort A und C wird eine Schnittstelle für das LoRa-Funkgerät und eine für das WiFi Funk erhalten. 
+Am Standort B wird eine Schnittstelle für das LoRa-Funkgerät und eine Schnittstelle für jedes WiFi Funkgerät
+in die Reticulum-Konfigurationsdatei aufgenommen. 
+Die Option Transportknoten ist in der Konfiguration aller drei Gateways aktiviert.
+
+Das Netz ist nun betriebsbereit und kann die Nutzer in allen drei Gebieten bedienen.
+Die Organisation bereitet ein LoRa-Funkgerät vor, das den Endnutzern zusammen mit einer
+Reticulum-Konfigurationsdatei, die die richtigen Parameter für die Kommunikation 
+mit den an den Gateway-Standorten installierten LoRa-Funkgeräten enthält.
+
+Sobald die Nutzer eine Verbindung zum Netz hergestellt haben, 
+kann jeder mit jedem kommunizieren über alle drei Standorte hinweg.
+
+Überbrückung über das Internet
+==========================
+
+Während die Organisation wächst, bilden sich mehrere neue Gemeinschaften an Orten, 
+die zu weit vom Kernnetz entfernt sind, um über WiFi-Links erreichbar zu sein. 
+Neue Gateways, werden für die neuen Gemeinschaften an den neuen Standorten D und E eingerichtet, 
+aber Sie sind jedoch vom Kernnetz isoliert und bedienen nur die lokalen Nutzer.
+
+Nach Prüfung der Möglichkeiten wird festgestellt, dass es möglich ist, 
+eine Internetverbindung am Standort A zu installieren, und eine Schnittstelle der Internetverbindung 
+wird für Reticulum auf dem Raspberry Pi am Standort A konfiguriert.
+
+Ein Mitglied der Organisation am Standort D, namens Dori, ist bereit zu helfen, 
+indem sie die Internetverbindung spendet, die sie bereits zu Hause hat, und kann einen Raspberry
+Pi laufen zu lassen. Auf ihrem Pi wird eine neue Reticulum-Schnittstelle konfiguriert, 
+die sich mit der neu aktivierten Internetschnittstelle des Gateways am Standort A verbindet. 
+Dori ist nun sowohl mit allen Knoten an ihrem eigenen Standort (über das LoRa-Gateway auf dem Hügel) 
+und mit allen kombinierten Nutzern der Standorte A, B und C vernetzt. 
+Dann aktiviert sie den Reticulum Transport auf ihrem Knoten, 
+somit kann Der Datenverkehr vom Standort D nun jeden an den Standorten A, B und C erreichen und umgekehrt.
+
+Wachstum und Konvergenz
+======================
+
+Wenn die Organisation wächst, werden weitere Gateways hinzugefügt, um mit der wachsenden Zahl der Nutzer Schritt zu halten.
+Einige lokale Gateways fügen sogar UKW-Funkgeräte und Paketmodems hinzu, um entlegene Nutzer und Gemeinden zu erreichen,
+die für die LoRa-Funkgeräte und WiFi-Backhauls unerreichbar sind.
+
+Je mehr Standorte, Gateways und Nutzer angeschlossen werden, desto geringer ist der Koordinierungsaufwand.
+Wenn eine Gemeinde eine Verbindung zur nächsten hinzufügen möchte kann dies einfach geschehen, 
+ohne dass alle beteiligt werden müssen oder Adressraum oder Routing-Tabellen zu koordinieren.
+
+Durch die zusätzliche geografische Abdeckung stellen die Betreiber am Standort A eines Tages fest, 
+dass die ursprünglichen Internet-Brückenschnittstellen nicht mehr genutzt werden müssen. 
+Das Netz ist konvergiert, so dass es vollständig selbständig verbunden ist, und die Standorte, 
+die früher schlecht angebundene Ausreißer waren, sind nun integraler Bestandteil des Netzes.

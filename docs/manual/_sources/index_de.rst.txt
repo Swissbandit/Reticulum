@@ -1,0 +1,38 @@
+******************************
+Reticulum Netzwerk Stack Handbuch
+******************************
+Dieses Handbuch soll Ihnen alle Informationen liefern, die Sie benötigen, um
+Reticulum zu verstehen, Netzwerke aufzubauen oder Programme mit Reticulum zu entwickeln oder
+um an der Entwicklung von Reticulum selbst mitzuwirken.
+
+.. only:: html
+
+   Inhaltsverzeichnis
+   =================
+
+.. toctree::
+   :maxdepth: 3
+
+   whatis
+   gettingstartedfast
+   using
+   understanding
+   hardware
+   interfaces
+   networks
+   examples
+   support
+
+.. toctree::
+   :maxdepth: 2
+
+   reference
+
+
+.. only:: html
+
+   Indizes und Tabellen
+   ==================
+
+   * :ref:`genindex`
+   * :ref:`search`

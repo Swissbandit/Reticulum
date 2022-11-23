@@ -1,0 +1,712 @@
+
+.. _interfaces-main:
+
+********************
+Unterstützte Schnittstellen
+********************
+
+Reticulum unterstützt die Verwendung vieler verschiedener Geräte als Netzwerkschnittstellen und
+Sie können diese Geräte nach Belieben miteinander kombinieren. 
+Die Anzahl der verschiedenen Netzwerktopologien, die Sie mit Reticulum erstellen können, ist mehr oder weniger endlos, 
+aber Allen gemeinsam ist, dass Sie eine oder mehrere *Schnittstellen* definieren müssen, die Reticulum verwenden soll.
+
+In den folgenden Abschnitten werden die derzeit in Reticulum verfügbaren Schnittstellen beschrieben,
+und geben Beispielkonfigurationen für die jeweiligen Schnittstellentypen.
+
+Einen Überblick darüber, wie Netzwerke über verschiedene Schnittstellentypen gebildet werden können, 
+sehen Sie sich das Kapitel :ref:`Netzwerke erstellen<networks-main>` in diesem Handbuch.
+
+
+.. _interfaces-auto:
+
+Automatische Schnittstelle
+==============
+
+Die automatische Schnittstelle ermöglicht die Kommunikation mit anderen Reticulum Knoten über autokonfiguriertes IPv6 und UDP. 
+Sie benötigt keine funktionale IP Infrastruktur wie Router oder DHCP-Server, 
+sondern benötigt zumindest ein Vermittlungsmedium zwischen den Peers 
+(ein kabelgebundener Switch, ein Hub, ein WiFi-Zugangspunkt oder ähnliches), 
+und dass link-local IPv6 in Ihrem Betriebssystem aktiviert ist, was bei fast allen Betriebssystemen standardmäßig der Fall sein sollte.
+
+.. code::
+
+  # Dieses Beispiel demonstriert eine TCP-Server-Schnittstelle.
+  # Sie wartet auf eingehende Verbindungen an der
+  # angegebenen IP-Adresse und Portnummer.
+  
+  [[Default Interface]]
+    type = AutoInterface
+    interface_enabled = True
+
+    # Sie können mehrere isolierte Reticulum
+    # Netze auf demselben physischen LAN erstellen, indem Sie
+    # unterschiedliche Gruppen-IDs angeben.
+
+    group_id = reticulum
+
+    # Sie können auch gezielt auswählen, welche
+    # Kernel-Netzwerkgeräte verwendet werden sollen.
+
+    devices = wlan0,eth1
+
+    # Oder lassen Sie das AutoInterface alle geeigneten Geräte verwenden,
+    # außer einer Liste von ignorierten Geräten.
+
+    ignored_devices = tun0,eth0
+
+
+Wenn Sie über IPv6 mit dem Internet verbunden sind und Ihr Provider IPv6-Multicast leitet, 
+können Sie die automatische Schnittstelle möglicherweise so konfigurieren, dass sie global andere Reticulum-Knoten 
+innerhalb der von Ihnen ausgewählten Gruppen-ID automatisch erkennen kann. 
+Sie können den Erkennungsbereich festlegen, indem Sie die Option auf ``link``, ``admin``, ``site``, ``organisation`` oder ``global`` setzen.
+
+.. code::
+  
+  [[Default Interface]]
+    type = AutoInterface
+    interface_enabled = True
+
+    # Konfigurieren Sie die globale Erkennung
+
+    group_id = custom_network_name
+    discovery_scope = global
+
+    # Andere Konfigurationsmöglichkeiten
+
+    discovery_port = 48555
+    data_port = 49555
+
+
+.. _interfaces-i2p:
+
+I2P-Schnittstelle
+=============
+
+Mit der I2P-Schnittstelle können Sie Reticulum-Instanzen über das Unsichtbares Internet-Protokoll <https://i2pd.website>`_ verbinden. 
+Dies kann besonders nützlich sein, wenn Sie eine global erreichbare Reticulum-Instanz hosten möchten,
+aber keinen Zugang zu öffentlichen IP-Adressen haben, eine häufig wechselnde IP-Adresse haben 
+oder Firewalls den eingehenden eingehenden Verkehr blockieren.
+
+Über die I2P-Schnittstelle erhalten Sie eine global erreichbare, portable und dauerhafte I2P-Adresse, 
+unter der Ihre Reticulum-Instanz erreicht werden kann.
+
+Um die I2P-Schnittstelle zu nutzen, müssen Sie einen I2P-Router auf Ihrem System laufen haben. 
+Der einfachste Weg, dies zu erreichen, ist das Herunterladen und Installieren der neuesten Version des ``i2pd`` Pakets
+<https://github.com/PurpleI2P/i2pd/releases/latest>`_ . 
+Für weitere Details über I2P, siehe die `geti2p.net Website <https://geti2p.net/en/about/intro>`_.
+
+Wenn ein I2P-Router auf Ihrem System läuft, können Sie einfach eine I2P-Schnittstelle zu Reticulum hinzufügen:
+
+.. code::
+
+  [[I2P]]
+    type = I2PInterface
+    interface_enabled = yes
+    connectable = yes
+
+Beim ersten Start generiert Reticulum eine neue I2P-Adresse für die Schnittstelle und beginnt, 
+diese auf eingehenden Datenverkehr zu überwachen. 
+Dies kann beim ersten Mal eine Weile dauern, insbesondere wenn Ihr I2P-Router ebenfalls gerade erst gestartet wurde 
+und noch nicht gut mit dem I2P-Netzwerk verbunden ist. 
+Wenn Sie fertig sind, sollten Sie die I2P base32 Adresse in Ihrer Logdatei sehen. 
+Sie können auch den Status der Schnittstelle mit dem ``rnstatus`` Dienstprogramm überprüfen.
+
+Um sich mit anderen Reticulum-Instanzen über I2P zu verbinden, fügen Sie einfach eine kommaseparierte
+Liste von I2P-Base32-Adressen zur Option ``Peers`` der Schnittstelle hinzu:
+
+.. code::
+
+  [[I2P]]
+    type = I2PInterface
+    interface_enabled = yes
+    connectable = yes
+    peers = 5urvjicpzi7q3ybztsef4i5ow2aq4soktfj7zedz53s47r54jnqq.b32.i2p
+
+Der Aufbau von I2P-Verbindungen zu den gewünschten Peers kann zwischen einigen Sekunden und einigen Minuten dauern, 
+weshalb Reticulum diesen Prozess im Hintergrund betreibt und relevante Ereignisse in das Protokoll einbringt.
+
+**Bitte beachten Sie!** Die I2P-Schnittstelle ist die einfachste Möglichkeit, Reticulum über I2P zu nutzen.
+Es ist auch möglich, die TCP-Server- und Client-Schnittstellen manuell über I2P zu tunneln. 
+Dies kann in Situationen nützlich sein, in denen mehr Kontrolle benötigt wird, erfordert aber eine manuelle Einrichtung des Tunnels 
+über die Konfiguration des I2P-Daemons.
+
+Es ist wichtig zu beachten, dass die beiden Methoden *austauschbar kompatibel* sind.
+Sie können das I2PInterface verwenden, um sich mit einem TCPServerInterface zu verbinden, das manuell über I2P getunnelt wurde. 
+Dies bietet ein hohes Maß an Flexibilität bei der Netzwerkeinrichtung, sowie die Benutzerfreundlichkeit in einfacheren Anwendungsfällen.
+
+
+.. _interfaces-tcps:
+
+TCP Server Schnittstelle
+====================
+
+Die TCP-Server-Schnittstelle ist geeignet, um anderen Teilnehmern die Verbindung über das Internet oder private IP-Netzwerke zu verbinden. 
+Wenn eine TCP-Server-Schnittstelle konfiguriert wurde, können andere Reticulum-Peers über eine TCP-Client-Schnittstelle eine Verbindung zu ihr herstellen.
+
+.. code::
+
+  # Dieses Beispiel demonstriert eine TCP-Server-Schnittstelle.
+  # Sie wartet auf eingehende Verbindungen an der
+  # angegebenen IP-Adresse und Portnummer.
+  
+  [[TCP Server Interface]]
+    type = TCPServerInterface
+    interface_enabled = True
+
+    # Diese Konfiguration lauscht auf allen IP
+    # Schnittstellen auf Port 4242
+    
+    listen_ip = 0.0.0.0
+    listen_port = 4242
+
+    # Alternativ können Sie sich auch an eine bestimmte IP binden
+    
+    # listen_ip = 10.0.0.88
+    # listen_port = 4242
+
+    # Oder ein bestimmtes Netzwerkgerät
+    
+    # device = eth0
+    # port = 4242
+
+**Bitte beachten Sie!** Die TCP-Schnittstellen unterstützen Tunneling über I2P, 
+aber um dies zuverlässig zu tun, müssen Sie die Option i2p_tunneled verwenden:
+
+.. code::
+
+  [[TCP Server on I2P]]
+      type = TCPServerInterface
+      interface_enabled = yes
+      listen_ip = 127.0.0.1
+      listen_port = 5001
+      i2p_tunneled = yes
+
+In fast allen Fällen ist es einfacher, das dedizierte ``I2PInterface`` zu verwenden, aber für eine vollständige Kontrolle 
+und die Verwendung von I2P-Routern, die auf externen Systemen laufen, gibt es auch diese Option.
+
+.. _interfaces-tcpc:
+
+TCP Client Schnittstelle
+====================
+
+Um eine Verbindung zu einer TCP-Server-Schnittstelle herzustellen, würden Sie natürlich die TCP-Client Schnittstelle. 
+Viele TCP-Client-Schnittstellen von verschiedenen Peers können sich gleichzeitig mit der gleichen TCP-Server-Schnittstelle verbinden.
+
+Die TCP-Schnittstellentypen können auch Unterbrechungen in der IP-Verbindungsschicht tolerieren.
+Das bedeutet, dass Reticulum IP-Verbindungen, die auf- und absteigen, problemlos verarbeiten kann,
+und stellt die Verbindung nach einem Ausfall wieder her, sobald das andere Ende einer TCP-Schnittstelle wieder verfügbar ist.
+
+.. code::
+
+  # Hier ist ein Beispiel für eine TCP-Client-Schnittstelle. Der
+  # target_host kann entweder eine IP-Adresse oder ein Hostname sein.
+
+  [[TCP Client Interface]]
+    type = TCPClientInterface
+    interface_enabled = True
+    target_host = 127.0.0.1
+    target_port = 4242
+
+Es ist auch möglich, diesen Schnittstellentyp zu verwenden, um eine Verbindung über andere Programme oder Hardware-Geräte zu verbinden, 
+die eine KISS-Schnittstelle an einem TCP-Port zur Verfügung stellen, zum Beispiel Software-basierte Soundmodems. 
+Verwenden Sie dazu die Option ``kiss_framing``:
+
+.. code::
+
+  # Hier ist ein Beispiel für eine TCP-Client-Schnittstelle, die eine Verbindung
+  # zu einem Software-TNC-Soundmodem an einem KISS-over-TCP-Port.
+
+  [[TCP KISS Interface]]
+    type = TCPClientInterface
+    interface_enabled = True
+    kiss_framing = True
+    target_host = 127.0.0.1
+    target_port = 8001
+
+**Vorsicht!** Verwenden Sie die KISS-Framing-Option nur, wenn Sie sich mit externen Geräten und Programmen
+wie Soundmodems und ähnlichem über TCP verbinden. 
+Bei Verwendung des ``TCPClientInterface`` in Verbindung mit dem ``TCPServerInterface`` sollten Sie
+niemals ``kiss_framing`` aktivieren, da dies die internen Zuverlässigkeits- und Wiederherstellungsmechanismen blockiert, 
+welche sonst die Leistung über unzuverlässige und unterbrochene TCP-Verbindungen aufrecht erhält.
+
+**Bitte beachten Sie!** Die TCP-Schnittstellen unterstützen Tunneling über I2P, aber um dies zuverlässig zu tun,
+müssen Sie die Option i2p_tunneled verwenden:
+
+.. code::
+
+  [[TCP Client over I2P]]
+      type = TCPClientInterface
+      interface_enabled = yes
+      target_host = 127.0.0.1
+      target_port = 5001
+      i2p_tunneled = yes
+
+
+.. _interfaces-udp:
+
+UDP Schnittstelle
+=============
+
+Eine UDP-Schnittstelle kann für die Kommunikation über IP-Netze nützlich sein, bei privaten als auch im Internet. 
+Sie ermöglicht auch Broadcast-Kommunikation über IP-Netze, so dass es eine einfache Möglichkeit ist, 
+die Verbindung mit allen anderen Peers in einem lokalen Netzwerk zu ermöglichen.
+
+*Bitte beachten Sie!* Die Verwendung von Broadcast-UDP-Datenverkehr hat Auswirkungen auf die Leistung, insbesondere bei WiFi. 
+Wenn Ihr Ziel lediglich darin besteht, eine einfache Kommunikation mit allen Peers in Ihrer lokalen Ethernet-Broadcast-Domäne zu ermöglichen, 
+ist die :ref:`Auto Interface<interfaces-auto>` eine bessere Lösung und ist sogar einfacher zu benutzen.
+
+.. code::
+
+  # Dieses Beispiel ermöglicht die Kommunikation mit anderen
+  # lokalen Reticulum-Peers über UDP.
+  
+  [[UDP Interface]]
+    type = UDPInterface
+    interface_enabled = True
+
+    listen_ip = 0.0.0.0
+    listen_port = 4242
+    forward_ip = 255.255.255.255
+    forward_port = 4242
+
+    # Die obige Konfiguration ermöglicht die Kommunikation
+    # innerhalb der lokalen Broadcast-Domänen aller lokalen
+    # IP-Schnittstellen.
+
+    # Anstatt listen_ip, listen_port anzugeben,
+    # forward_ip und forward_port, können Sie auch
+    # an ein bestimmtes Netzwerkgerät binden wie unten.
+
+    # device = eth0
+    # port = 4242
+
+    # Angenommen, das Gerät eth0 hat die Adresse
+    # 10.55.0.72/24, würde die obige Konfiguration
+    # mit der folgenden manuellen Konfiguration übereinstimmen.
+    # Beachten Sie, dass wir sowohl die Broadcast-Adresse der Netzwerksegmente abhören als auch weiterleiten.
+
+    # listen_ip = 10.55.0.255
+    # listen_port = 4242
+    # forward_ip = 10.55.0.255
+    # forward_port = 4242
+
+    # Sie können natürlich auch nur mit
+    # einer einzigen IP-Adresse verbinden.
+
+    # listen_ip = 10.55.0.15
+    # listen_port = 4242
+    # forward_ip = 10.55.0.16
+    # forward_port = 4242
+
+
+.. _interfaces-rnode:
+
+RNode LoRa Schnittstelle
+====================
+
+Um Reticulum über LoRa zu nutzen, kann die Schnittstelle `RNode <https://unsigned.io/rnode/>`_
+verwendet werden und bietet volle Kontrolle über LoRa-Parameter.
+
+.. code::
+
+  # Hier ist ein Beispiel, wie man eine LoRa-Schnittstelle hinzufügt
+  # mit dem RNode LoRa Transceiver.
+
+  [[RNode LoRa Interface]]
+    type = RNodeInterface
+
+    # Aktivieren Sie die Schnittstelle, wenn Sie sie nutzen wollen!
+    interface_enabled = True
+
+    # Serieller Anschluss für das Gerät
+    port = /dev/ttyUSB0
+
+    # Frequenz einstellen auf 867.2 MHz
+    frequency = 867200000
+
+    # LoRa-Bandbreite einstellen to 125 KHz
+    bandwidth = 125000
+
+    # TX-(sende)Leistung auf 7 dBm einstellen (5 mW)
+    txpower = 7
+
+    # Wählen Sie den Spreizungsfaktor 8. Gültiger 
+    # Bereich ist 7 bis 12, wobei 7
+    # der schnellste und 12
+    # die größte Reichweite hat.
+    spreadingfactor = 8
+
+    # Auswahl der Kodierrate 5. Gültiger Bereich
+    # ist 5 bis 8, wobei 5 der schnellste
+    # und 8 der längste Bereich ist.
+    codingrate = 5
+
+    # Sie können den RNode so konfigurieren, dass er
+    # Identifikation auf dem Kanal mit
+    # Intervall sendet, indem Sie die
+    # folgenden zwei Parameter aktivieren.
+    # id_callsign = MYCALL-0
+    # id_interval = 600
+
+    # Für bestimmte selbstgebaute RNode-Schnittstellen
+    # mit wenig RAM, kann die Verwendung der Packet
+    # Flusskontrolle nützlich sein. 
+    # Standardmäßig ist sie deaktiviert.
+    flow_control = False
+
+.. _interfaces-serial:
+
+Serielle Schnittstelle
+================
+
+Reticulum kann direkt über serielle Schnittstellen oder über jedes Gerät mit serieller Schnittstelle verwendet werden, 
+das Daten transparent weiterleitet. Nützlich für die Kommunikation direkt über ein Kabelpaar 
+oder für die Verwendung von Geräten wie Datenfunkgeräten und Lasern.
+
+.. code::
+
+  [[Serial Interface]]
+    type = SerialInterface
+    interface_enabled = True
+
+    # Serieller Anschluss für das Gerät
+    port = /dev/ttyUSB0
+
+    # Stellen Sie die serielle Baudrate und andere
+    # Konfigurationsparameter ein.
+    speed = 115200
+    databits = 8
+    parity = none
+    stopbits = 1
+
+.. _interfaces-pipe:
+
+Pipe Schnittstelle
+==============
+
+Mit dieser Schnittstelle kann Reticulum jedes beliebige Programm als Schnittstelle über `stdin` und stdout" verwenden. 
+Auf diese Weise lassen sich leicht virtuelle Schnittstellen erstellen 
+oder Schnittstellen mit kundenspezifischer Hardware oder zu anderen Systemen einrichten.
+
+.. code::
+
+  [[Pipe Interface]]
+    type = PipeInterface
+    interface_enabled = True
+
+    # Externer Befehl zur Ausführung
+    command = netcat -l 5757
+
+    # Optionale Respawn-Verzögerung, in Sekunden
+    respawn_delay = 5
+
+Reticulum schreibt alle Pakete in `stdin` der Option ``command`` und liest und scannt kontinuierlich `stdout` nach Reticulum-Paketen. 
+Wenn ``EOF`` erreicht wird, wird Reticulum versuchen, das Programm nach einer Wartezeit von ``respawn_interval`` neu zu starten.
+
+.. _interfaces-kiss:
+
+KISS Schnittstelle
+==============
+
+Mit der KISS-Schnittstelle können Sie Reticulum über eine Vielzahl von Packet Radio Funkmodems und TNCs verwenden, 
+einschließlich "OpenModem <https://unsigned.io/openmodem/>".
+KISS-Schnittstellen können auch so konfiguriert werden, dass sie regelmäßig Beacons senden zur Stationsidentifizierung.
+
+.. code::
+
+  [[Packet Radio KISS Interface]]
+    type = KISSInterface
+    interface_enabled = True
+
+    # Serieller Anschluss für das Gerät
+    port = /dev/ttyUSB1
+
+    # Stellen Sie die serielle Baudrate und andere
+    # Konfigurationsparameter ein.
+    speed = 115200    
+    databits = 8
+    parity = none
+    stopbits = 1
+
+    # Stellen Sie die Modempräambel ein.
+    preamble = 150
+
+    # Stellen Sie das Modem-Sendeband ein.
+    txtail = 10
+
+    # Konfigurieren Sie die CDMA-Parameter.
+    #  Diese Einstellungen sind sinnvolle Standardwerte.
+    persistence = 200
+    slottime = 20
+
+    # Sie können die Schnittstelle so konfigurieren, 
+    # dass sie Identifikation auf dem Kanal mit
+    # einem bestimmten Intervall sendet, 
+    # indem Sie die folgenden zwei Parameter einstellen.
+    # Die KISS Schnittstelle identifiziert sich nur, wenn das eingestellte
+    # Intervall seit der letzten Übertragung verstrichen ist.
+    # Das Intervall wird in Sekunden konfiguriert.
+    # Diese Option ist auskommentiert und wird
+    # standardmäßig nicht verwendet.
+    # id_callsign = MYCALL-0
+    # id_interval = 600
+
+    # Ob die KISS-Flusskontrolle verwendet werden soll.
+    # Dies ist nützlich für Modems, 
+    # welche einen kleinen internen Paketpuffer haben,
+    # aber stattdessen die Paketflusskontrolle unterstützen.
+    flow_control = false
+
+.. _interfaces-ax25:
+
+AX.25 KISS-Schnittstelle
+====================
+
+Wenn Sie Reticulum im Amateurfunkbereich verwenden, sollten Sie vielleicht die AX.25 KISS-Schnittstelle verwenden. 
+Auf diese Weise wird Reticulum den Datenverkehr automatisch in AX.25 kapseln 
+und identifiziert Ihre Stationsübertragungen mit Ihrem Rufzeichen und Ihrer SSID. 
+
+Tun Sie dies nur, wenn Sie es wirklich müssen! 
+Reticulum benötigt die AX.25 Schicht nicht! 
+Es verursacht zusätzlichen Overhead bei jedem Paket, das in AX.25 zu kapseln.
+
+Ein effizienterer Weg ist die Verwendung der einfachen KISS-Schnittstelle mit der oben beschriebenen Beaconing-Funktionalität.
+
+.. code::
+
+  [[Packet Radio AX.25 KISS Interface]]
+    type = AX25KISSInterface
+
+    # Rufzeichen und SSID der Station einstellen
+    callsign = NO1CLL
+    ssid = 0
+
+    # Aktivieren Sie die Schnittstelle, wenn Sie sie nutzen wollen!
+    interface_enabled = True
+
+    # Serieller Anschluss für das Gerät
+    port = /dev/ttyUSB2
+
+    # Stellen Sie die serielle Baudrate und andere
+    # Konfigurationsparameter ein.
+    speed = 115200    
+    databits = 8
+    parity = none
+    stopbits = 1
+
+    # Stellen Sie die Modempräambel ein. Eine 150ms Präambel
+    # sollte ein vernünftiger Standard sein, 
+    # muss aber möglicherweise für Funkgeräte mit langsamer
+    # Squelch und langem TX/RX turnaround geändert werden.
+    preamble = 150
+
+    # Stellen Sie das Modem-Sendeende ein. In den meisten
+    # Fällen sollte dieser Wert so niedrig wie möglich gehalten werden,
+    # um keine Sendezeit zu verschwenden.
+    txtail = 10
+
+    # Konfigurieren Sie die CDMA-Parameter. 
+    # Diese Einstellungen sind sinnvolle Standardwerte.
+    persistence = 200
+    slottime = 20
+
+    # Ob die KISS-Flusskontrolle verwendet werden soll.
+    # Dies ist nützlich für Modems mit einem
+    # kleinen internen Paketpuffer.
+    flow_control = false
+
+.. _interfaces-options:
+
+Gemeinsame Schnittstellenoptionen
+========================
+
+Für die meisten Schnittstellen gibt es eine Reihe von allgemeinen Konfigurationsoptionen.
+Diese können verwendet werden, um verschiedene Aspekte des Schnittstellenverhaltens zu steuern.
+
+
+ * | Die Option ``enabled`` teilt Reticulum mit, 
+     ob die Schnittstelle einblenden soll. Die Voreinstellung ist ``False``. 
+     Für jede Schnittstelle welche aktiviert werden soll, 
+     muss die Option ``enabled`` auf ``True`` oder ``Yes`` gesetzt werden.
+
+ * | Die Option ``mode`` erlaubt es, 
+     das Verhalten der Schnittstelle auf hoher Ebene auszuwählen.
+
+     - Der Standardwert ist ``full``. In diesem Modus sind alle Erkennungs-,
+       Meshing- und Transportfunktionen verfügbar.
+
+     - In der Betriebsart ``access_point`` (oder kurz ``ap``) arbeitet die
+       Schnittstelle als Netzwerkzugangspunkt. In diesem Modus,
+       werden Ankündigungen nicht automatisch auf der Schnittstelle verbreitet
+       und Pfade zu Zielen auf der Schnittstelle haben eine viel kürzere Verfallszeit. 
+       Dieser Modus ist nützlich um Schnittstellen zu erstellen, 
+       die größtenteils ruhig sind, außer wenn jemand sie tatsächlich benutzt. 
+       Ein Beispiel hierfür könnte eine Funkschnittstelle sein, die ein weites Gebiet versorgt, 
+       in dem die Benutzer kurzzeitig eine Verbindung herstellen, 
+       das Netz nutzen und dann wieder verschwinden.
+
+ * | Die Option ``outgoing`` legt fest, ob eine Schnittstelle senden darf.
+     Die Voreinstellung ist ``True``. Wenn sie auf ``False`` oder ``No`` gesetzt ist, 
+     wird die Schnittstelle nur Daten empfangen und niemals senden.
+
+ * | Die Option ``network_name`` setzt den virtuellen Netzwerknamen für
+     die Schnittstelle. Dies erlaubt dass mehrere separate Netzwerksegmente
+     auf demselben physikalischen Kanal oder Medium koexistieren.
+
+ * | Die Option ``passphrase`` setzt eine Authentifizierungs-Passphrase auf
+     der Schnittstelle. Diese Option kann in Verbindung mit der Option
+     Option ``network_name`` verwendet werden, oder auch alleine.
+
+ * | Die Option ``ifac_size`` erlaubt die Anpassung der Länge des
+     Interface Authentication Codes, die von jedem Paket auf benannten
+     und/oder authentifizierten Netzwerksegmenten übertragen werden. 
+     Sie ist standardmäßig eingestellt auf eine für die betreffende Schnittstelle 
+     geeignete Größe eingestellt, kann jedoch mit dieser Option auf eine 
+     benutzerdefinierte Größe zwischen 8 und 512 Bit eingestellt werden.
+     Bei normaler Verwendung sollte diese Option nicht von der Vorgabe geändert werden.
+
+ * | Mit der Option ``announce_cap`` können Sie die maximale Bandbreite konfigurieren,
+     die zu einem bestimmten Zeitpunkt für die Verbreitung von Durchsagen 
+     und anderem Datenverkehr zur Aufrechterhaltung des Netzwerks verfügbar ist.
+     Sie ist standardmäßig auf 2% konfiguriert und sollte normalerweise nicht geändert werden müssen,
+     kann aber auf jeden Wert zwischen ``1`` und ``100`` gesetzt werden.
+
+     *Wenn eine Schnittstelle ihre Ankündigungsgrenze überschreitet, 
+     stellt sie die Ankündigungen für eine spätere Übertragung in die Warteschlange. 
+     Reticulum priorisiert immer die Weitergabe von Ankündigungen von nahegelegenen Knoten zuerst. 
+     Dadurch wird sichergestellt, dass die lokale Topologie priorisiert wird 
+     und dass langsame Netze nicht durch miteinander verbundene schnelle Netze überfordert werden.*
+
+     *Ziele, die sich schnell wieder ankündigen, werden in der Priorität herabgestuft.
+     Der Versuch, durch Ankündigungsspamming "Erster in der Reihe" zu werden, 
+     wird genau das Gegenteil bewirken: Sie werden jedes Mal an das Ende der Warteschlange verschoben
+     wenn eine neue Ankündigung von dem übermäßig ankündigenden Ziel empfangen wird.*
+
+     *Dies bedeutet, dass es immer von Vorteil ist, eine ausgewogene Durchsagefrequenz zu wählen
+     und nicht mehr Durchsagen zu machen, als tatsächlich notwendig sind
+     für das Funktionieren Ihrer Anwendung.*
+
+ * | Die Option ``bitrate`` konfiguriert die Bitrate der Schnittstelle.
+     Reticulum verwendet die von der Hardware gemeldeten Schnittstellengeschwindigkeiten, 
+     oder versucht, eine geeignete Rate zu ermitteln, wenn die Hardware keine meldet.
+     In den meisten Fällen sollte die automatisch ermittelte Rate ausreichend sein.
+     Sie kann jedoch mit der Option ``bitrate`` konfiguriert werden, 
+     um die Geschwindigkeit der Schnittstelle in *Bits pro Sekunde* festzulegen..
+
+
+.. _interfaces-modes:
+
+Schnittstellenmodi
+===============
+
+Die optionale Einstellung ``mode`` ist für alle Schnittstellen verfügbar und ermöglicht es, 
+das Verhalten der Schnittstelle auf hoher Ebene aus einer Reihe von Modi auszuwählen.
+Diese Modi beeinflussen, wie Reticulum Pfade im Netzwerk auswählt, wie Ankündigungen
+propagiert werden, wie lange Pfade gültig sind und wie Pfade entdeckt werden.
+
+Die Konfiguration von Modi auf Schnittstellen ist **nicht** unbedingt erforderlich, 
+kann aber nützlich sein wenn Sie komplexere Netzwerke aufbauen oder sich mit ihnen verbinden. 
+Wenn Ihre Reticulum Instanz keinen Transportknoten betreibt, ist es selten sinnvoll, Schnittstellenmodi zu konfigurieren.
+In solchen Fällen sollten die Schnittstellen im Allgemeinen im Standardmodus belassen werden.
+
+ * | Der Standardmodus ist ``full``. In diesem Modus sind alle Erkennungs-,
+     Meshing- und Transportfunktionen aktiviert.
+
+ * | Der ``Gateway``-Modus (oder kurz ``gw``) hat auch alle
+     Discovery-, Meshing- und Transportfunktionen zur Verfügung, versucht aber zusätzlich, 
+     unbekannte Pfade für andere Knoten an der ``Gateway``-Schnittstelle zu finden.
+     Wenn Reticulum eine Pfadanfrage für ein unbekanntes
+     Ziel von einem Knoten an einer ``Gateway``-Schnittstelle erhält, wird es versuchen, 
+     diesen Pfad über alle anderen aktiven Schnittstellen zu ermitteln,
+     und leitet den entdeckten Pfad an den Antragsteller weiter, wenn einer gefunden wird.
+
+   | Wenn Sie anderen Knoten erlauben wollen, Pfade weiträumig aufzulösen oder eine Verbindung
+     mit einem Netzwerk über eine Schnittstelle zu verbinden, kann es sinnvoll sein, 
+     es in diesen Modus zu versetzen. Indem man eine Kette von ``Gateway``-Schnittstellen erstellt, 
+     können andere Knoten in der Lage sein, sofort Pfade zu jedem Ziel entlang der Kette zu finden.
+
+   | *Bitte beachten sie!* Es ist die Schnittstelle *zu den Clients*,
+     welche in den ``gateway``-Modus versetzt werden muss, damit dies funktioniert, 
+     nicht die Schnittstelle, die dem weiteren Netzwerk zugewandt ist. 
+     (dafür kann der ``boundary`` Modus jedoch nützlich sein)
+
+ * | In der Betriebsart ``access_point`` (oder kurz ``ap``) arbeitet die Schnittstelle als Netzwerkzugangspunkt. 
+     In diesem Modus werden Ankündigungen nicht automatisch auf der Schnittstelle verbreitet,
+     und Pfade zu Zielen auf der Schnittstelle haben eine viel kürzere Verfallszeit. 
+     Darüber hinaus werden Pfadanfragen von Clients auf der Access Point Schnittstelle 
+     auf die gleiche Weise behandelt wie die ``Gateway``-Schnittstelle.
+
+   | Dieser Modus ist nützlich, um Schnittstellen zu erstellen, 
+     die ruhig bleiben, bis jemand sie tatsächlich benutzt.
+     Ein Beispiel könnte eine Funkschnittstelle sein, die ein weites Gebiet versorgt,
+     wo erwartet wird, dass die Benutzer sich kurzzeitig verbinden, 
+     das Netzwerk nutzen und dann wieder verschwinden.
+
+ * | Der ``Roaming``-Modus sollte auf Schnittstellen verwendet werden, 
+     die Roaming (physisch mobil) sind, aus der Perspektive der
+     anderen Knoten im Netz. Wenn zum Beispiel ein Fahrzeug
+     mit einer externen LoRa-Schnittstelle und einer internen,
+     WiFi-basierte Schnittstelle, die Geräte bedient, die sich
+     *mit* dem Fahrzeug bewegen, sollte die externe LoRa-Schnittstelle
+     als ``Roaming`` konfiguriert werden, und die interne Schnittstelle kann
+     im Standardmodus belassen werden. Wenn der Transport aktiviert ist, 
+     erlaubt eine solche Konfiguration, dass alle internen Geräte 
+     sich gegenseitig erreichen können, und alle anderen Geräte, 
+     die auf der LoRa-Seite des Netzwerks verfügbar sind, wenn sie in Reichweite sind. 
+     Geräte auf der LoRa Seite des Netzwerks werden auch in der Lage sein, 
+     Geräte zu erreichen, wenn sie sich in Reichweite befinden. 
+     Pfade über ``Roaming``-Schnittstellen laufen ebenfalls schneller ab.
+
+ * | Der Zweck des ``boundary``-Modus ist es, Schnittstellen zu spezifizieren
+     die Konnektivität mit Netzwerksegmenten herstellen,
+     die sich deutlich von demjenigen unterscheiden, in dem dieser Knoten existiert.
+     Wenn zum Beispiel eine Reticulum-Instanz Teil eines LoRa-basierten
+     Netzes ist, aber auch über eine Hochgeschwindigkeitsverbindung zu einem
+     öffentlichen Transportknoten im Internet hat, sollte die Schnittstelle
+     die eine Verbindung über das Internet herstellt, auf den Modus ``border`` eingestellt werden.
+
+Für eine Tabelle, die die Auswirkungen aller Modi auf die Ausbreitung von Ankündigungen beschreibt,
+finden Sie im Abschnitt :ref:`Regeln für die Ausbreitung von Ankündigungen<interfaces-announcerates>`.
+
+.. _interfaces-announcerates:
+
+Ankündigungs Intervall Kontrolle
+=====================
+
+Die eingebauten Ankündigungs Kontrollmechanismen und die Standard ``announce_cap`` Option 
+sind die meiste Zeit ausreichend, aber in einigen Fällen, besonders auf schnellen Schnittstellen, 
+kann es nützlich sein, die Zielankündigungsrate zu kontrollieren. Die Verwendung der
+``announce_rate_target``, ``announce_rate_grace`` und ``announce_rate_penalty``
+Optionen kann dies auf einer Basis pro Schnittstelle gemacht werden, und moderiert die 
+*Rate, mit der empfangene Ankündigungen an andere Schnittstellen weitergegeben werden*.
+
+ * | Die Option ``announce_rate_target`` setzt die minimale Zeitspanne, in Sekunden fest, 
+     die zwischen empfangenen Ankündigungen für ein beliebiges Ziel gelten. 
+     Wenn dieser Wert zum Beispiel auf ``3600`` gesetzt wird, bedeutet das, dass Ankündigungen, 
+     die auf dieser Schnittstelle *empfangen* werden, nur einmal pro Stunde weitergesendet und
+     einmal pro Stunde an andere Schnittstellen weitergeleitet werden, egal wie oft sie
+     empfangen werden.
+
+ * | Der optionale Parameter ``announce_rate_grace`` legt fest, wie oft ein Ziel
+     gegen die Ankündigungsrate verstoßen kann, bevor die Zielrate durchgesetzt wird.
+
+ * | Der optionale Parameter ``announce_rate_penalty`` konfiguriert eine zusätzliche Zeitspanne, 
+     die zum normalen Ratenziel hinzugefügt wird. Wenn zum Beispiel eine Strafe von ``7200`` Sekunden definiert wird, 
+     wird der betreffende Knoten, sobald das Ratenziel erzwungen ist, 
+     seinem Ziel nur noch alle 3 Stunden seine Ankündigungen weitergeben, 
+     bis es seine tatsächliche Ankündigungsrate auf den Zielwert senkt.
+
+Dieser Mechanismus, in Verbindung mit den oben erwähnten ``annouce_cap``-Mechanismen bedeutet, 
+daß es wichtig ist, eine ausgewogene Ankündigungsstrategie für Ihre Ziele zu wählen. 
+Je ausgewogener Du diese Entscheidung treffen kannst, desto leichter wird es für Ihre Ziele sein, 
+in langsamere Netze zu gelangen, die viele Sprünge entfernt sind. 
+Oder Sie können mit häufigeren Ankündigungen nur Netze mit hoher Kapazität erreichen.
+
+Aktuelle Statistiken und Informationen über Ankündigungsraten können mit dem
+Befehl ``rnpath -r`` eingesehen werden.
+
+Es ist wichtig zu wissen, dass es keinen richtigen oder falschen Weg gibt, bezüglich den Ankündigungs Intervallen. 
+Langsamere Netze werden naturgemäß dazu neigen, weniger häufige Ankündigungen zu verwenden, 
+um Bandbreite zu sparen, während sehr schnelle Netze Anwendungen unterstützen können, 
+die sehr häufige Ankündigungen benötigen. Reticulum implementiert diese Mechanismen, um sicherzustellen,
+dass eine große Bandbreite von Netzwerktypen nahtlos *zusammen existieren* und miteinander verbunden werden kann.

@@ -1,0 +1,168 @@
+******************
+Was ist Reticulum?
+******************
+
+Reticulum ist ein kryptografiebasierter Netzwerkstack zum Aufbau von lokalen und
+Wide-Area-Netzwerkverbindungen mit leicht verfügbarer Hardware aufzubauen, die auch unter
+ungünstigen Bedingungen, wie extrem geringer Bandbreite und sehr hoher Latenzzeit, funktionieren.
+
+Mit Reticulum können Sie Weitverkehrsnetze mit handelsüblichen Tools aufbauen und
+bietet Ende-zu-Ende-Verschlüsselung, Vorwärtsgeheimnis, autokonfigurierende kryptografischer
+Multi-Hop-Transport, effiziente Adressierung, fälschungssichere Paketbestätigungen und mehr.
+
+Aus Sicht der Nutzer ermöglicht Reticulum die Entwicklung von Anwendungen, 
+welche die Autonomie und Souveränität von Gemeinschaften und Individuen respektieren und stärken.
+Reticulum ermöglicht eine sichere digitale Kommunikation, die nicht der Kontrolle,
+Manipulation oder Zensur von außen unterliegt.
+
+Reticulum ermöglicht den Aufbau sowohl kleiner als auch potenziell planetarer
+Netzwerke, ohne dass hierarchische oder behördliche Strukturen zur Kontrolle oder zum verwalten benötigt werden, 
+wodurch Individuen und Gemeinschaften die volle Souveränität über ihre eigenen Netzwerksegmente haben.
+
+Reticulum ist ein vollständiger Netzwerkstack und benötigt weder IP noch höhere Schichten, 
+obwohl es einfach ist, IP (mit TCP oder UDP) als Träger für Reticulum zu verwenden.
+Es ist daher trivial, Reticulum über das Internet oder private IP-Netze zu tunneln. 
+Reticulum ist direkt auf kryptographischen Prinzipien aufgebaut, 
+was die Ausfallsicherheit und stabile Funktionalität in offenen und vertrauenslosen Netzwerken ermöglicht.
+
+Es werden keine Kernelmodule oder Treiber benötigt. Reticulum läuft vollständig im Userland 
+und kann auf praktisch jedem System laufen, auf dem Python 3 läuft. 
+Reticulum läuft sogar auf kleinen Einplatinencomputern wie dem Pi Zero.
+
+
+Aktueller Stand
+==============
+**Bitte beachten Sie!** Reticulum ist derzeit als Beta-Software zu betrachten. Alle Kernprotokoll
+Funktionen sind implementiert und funktionieren, aber es werden wahrscheinlich noch weitere
+im realen Einsatz erforscht werden. *Es wird Bugs geben*. Die API und das Wire-Format können im Moment 
+als stabil angesehen werden, können sich aber ändern, wenn dies unbedingt erforderlich ist.
+
+
+Was bietet Reticulum?
+==========================
+* Koordinationslose, weltweit eindeutige Adressierung und Identifizierung
+
+* Vollständig selbstkonfigurierendes Multi-Hop-Routing
+
+* Vollständige Anonymität des Initiators, Kommunikation ohne Preisgabe der eigenen Identität
+
+* Asymmetrische Verschlüsselung auf der Grundlage von X25519 und Ed25519-Signaturen als Basis für die gesamte Kommunikation
+
+* Vorwärtsgeheimnis durch Verwendung ephemerer Diffie-Hellman-Schlüssel mit elliptischer Kurve auf Curve25519
+
+* Reticulum verwendet die <https://github.com/fernet/spec/blob/master/Spec.md>_Fernet-Spezifikation für On-the-Wire/Over-the-Air-Verschlüsselung
+
+  * Alle Schlüssel sind kurzlebig und stammen aus einem ECDH-Schlüsselaustausch auf Curve25519
+
+  * AES-128 im CBC-Modus mit PKCS7 padding
+
+  * HMAC Verwendet SHA256 für die Authentifizierung
+
+  * IVs werden erzeugt durch os.urandom()
+
+* Nicht fälschbare Paketzustellungsbestätigungen
+
+* Eine Vielzahl von unterstützten Schnittstellentypen
+
+* Eine intuitive und entwicklerfreundliche API
+
+* Effizienter Verbindungsaufbau
+
+  * Die gesamten Bandbreitenkosten für den Aufbau einer Verbindung betragen nur 3 Pakete mit insgesamt 297 Byte.
+
+  * Geringe Kosten für das Offenhalten von Verbindungen mit nur 0,44 Bit pro Sekunde
+
+* Zuverlässige und effiziente Übertragung beliebiger Datenmengen
+
+  * Reticulum kann sowohl wenige Bytes als auch viele Gigabytes an Daten verarbeiten.
+
+  * Sequenzierung, Übertragungskoordination und Prüfsummenbildung erfolgen automatisch
+
+  * Die API ist sehr einfach zu bedienen und liefert den Übertragungsfortschritt
+
+* Authentifizierung und virtuelle Netzwerksegmentierung auf allen unterstützten Schnittstellentypen
+
+* Flexible Skalierbarkeit, was die Koexistenz und Interoperabilität von Netzen mit extrem niedriger Bandbreite mit großen Netzen mit hoher Bandbreite ermöglicht
+
+
+Wo kann Reticulum eingesetzt werden?
+============================
+Über praktisch jedes Medium, das mindestens einen Halbduplex-Kanal unterstützen kann
+mit einem Durchsatz von 500 Bit pro Sekunde und einer MTU von 500 Byte. 
+Datenfunkgeräte, Modems, LoRa-Funkgeräte, serielle Leitungen, AX.25 TNCs, digitale Amateurfunkmodi,
+Ad-hoc-WiFi, optische Verbindungen im freien Raum und ähnliche Systeme sind allesamt Beispiele 
+von Schnittstellen, für die Reticulum entwickelt wurde.
+
+Eine quelloffene LoRa-basierte Schnittstelle namens `RNode <https://unsigned.io/rnode>`_
+wurde als Beispiel für einen Transceiver entwickelt, der sich sehr gut für Reticulum eignet. 
+Es ist möglich, ihn selbst zu bauen, eine gewöhnliche LoRa Entwicklungsplatine in ein solches Gerät zu verwandeln, 
+oder es kann als kompletter Transceiver erworben werden.
+
+Reticulum kann auch über bestehende IP-Netzwerke gekapselt werden, 
+so dass nichts dagegen spricht, es über ein kabelgebundenes Ethernet oder Ihr lokales WiFi
+Netzwerk zu verwenden, wo es genauso gut funktionieren wird. 
+Tatsächlich liegt eine der Stärken von Reticulum in der einfachen Verbindung verschiedener Medien 
+zu einem selbstkonfigurierenden, widerstandsfähigen und verschlüsselten Meshnetzwerk.
+
+So ist es zum Beispiel möglich, einen Raspberry Pi sowohl mit einem LoRa-Funk, 
+einem Packet-Radio-TNC und einem WiFi-Netzwerk verbunden ist. 
+Sobald die Schnittstellen hinzugefügt sind, kümmert sich Reticulum um den Rest, 
+und jedes Gerät im WiFi Netzwerk kann mit Knoten auf der LoRa- 
+und der Paketfunkseite des Netzwerks kommunizieren und andersherum.
+
+Schnittstellentypen und Geräte
+===========================
+Reticulum implementiert eine Reihe allgemeiner Schnittstellentypen, welche die Kommunikationshardware abdecken, mit der Reticulum arbeiten kann. 
+Wenn Ihre Hardware nicht unterstützt wird, ist es relativ einfach, eine Schnittstellenklasse zu implementieren. 
+Derzeit kann Reticulum die folgenden Geräte und Kommunikationsmedien verwenden:
+
+* Jedes Ethernet-Gerät
+
+  * WiFi-Geräte
+
+  * Verkabelte Ethernet-Geräte
+
+  * Glasfaser-Transceiver
+
+  * Datenfunkgeräte mit Ethernet-Anschlüssen
+
+* LoRa unter Verwendung von `RNode <https://unsigned.io/rnode>`_
+
+  * Kann auf `vielen gängigen LoRa-Boards installiert werden <https://github.com/markqvist/rnodeconfigutil#supported-devices>`_
+
+  * Kann als `einsatzbereiter Transceiver erworben werden <https://unsigned.io/rnode>`_
+
+* Packet Radio TNCs, wie z.B. `OpenModem <https://unsigned.io/openmodem>`_
+
+  * Jeder Paketfunk-TNC im KISS-Modus
+
+  * Ideal für VHF- und UHF-Funk
+
+* Jedes Gerät mit einer seriellen Schnittstelle
+
+* Das I2P-Netzwerk
+
+* TCP über IP-Netzwerke
+
+* UDP über IP-Netzwerke
+
+* Alles, was man über stdio anschließen kann
+
+  * Reticulum kann externe Programme und Pipes als Schnittstellen nutzen
+
+  * Damit lassen sich virtuelle Schnittstellen leicht einhacken
+
+  * Oder um schnell Schnittstellen mit kundenspezifischer Hardware zu erstellen
+
+Eine vollständige Liste und weitere Details finden Sie im Kapitel :ref:`Unterstützte Interfaces<interfaces-main>`.
+
+
+Caveat Emptor
+==============
+Reticulum ist ein experimenteller Netzwerkstack und sollte als solcher betrachtet werden.
+Er wurde zwar unter Berücksichtigung der besten Kryptographie-Praktiken entwickelt,
+wurde aber nicht extern auf seine Sicherheit geprüft, und es könnte sehr wohl
+Bugs enthalten, die die Privatsphäre verletzen. 
+Um als sicher zu gelten, muss Reticulum einer gründlichen Sicherheitsüberprüfung 
+durch unabhängige Kryptographen und Sicherheitsforscher. 
+Wenn Sie helfen oder ein Audit sponsern wollen, nehmen Sie bitte Kontakt mit uns auf.

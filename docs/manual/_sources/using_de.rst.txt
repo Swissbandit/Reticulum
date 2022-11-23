@@ -1,0 +1,522 @@
+.. _using-main:
+
+******************************
+Verwendung von Reticulum auf Ihrem System
+******************************
+
+Reticulum wird nicht als Treiber oder Kernelmodul installiert, wie man es von einem Netzwerk-Stacks erwarten würde. 
+Stattdessen wird Reticulum als Python-Modul verteilt.
+Das bedeutet, dass für die Installation und Verwendung keine besonderen Berechtigungen erforderlich sind. 
+Es ist außerdem sehr leichtgewichtig und lässt sich einfach auf neue Systeme übertragen und dort installieren.
+
+Wenn Sie Reticulum installiert haben, wird jedes Programm oder jede Anwendung, 
+welche Reticulum verwendet, automatisch Reticulum laden und initialisieren, wenn es gestartet wird, 
+sofern es nicht bereits läuft.
+
+In vielen Fällen ist dieser Ansatz ausreichend. Wenn ein Programm Reticulum verwenden will, wird es geladen, initialisiert, 
+die Schnittstellen werden aufgerufen und das Programm kann nun über alle verfügbaren Reticulum-Netzwerke kommunizieren. 
+Wenn ein anderes Programm startet und ebenfalls auf das gleiche Reticulum-Netzwerk zugreifen möchte, 
+wird die gemeinsamgeteilte Instanz einfach freigegeben. 
+Dies funktioniert für eine beliebige Anzahl von Programmen und ist sehr einfach zu handhaben, 
+aber je nach Anwendungsfall gibt es gibt es andere Optionen.
+
+Konfiguration und Daten
+--------------------
+
+Reticulum speichert alle Informationen, die es zum Betrieb benötigt, in einem einzigen Dateisystem Verzeichnis. 
+Wenn Reticulum gestartet wird, sucht es nach einem gültigen Konfigurationsverzeichnis an den folgenden Stellen:
+
+- ``/etc/reticulum``
+- ``~/.config/reticulum``
+- ``~/.reticulum``
+
+Wenn kein bestehendes Konfigurationsverzeichnis gefunden wird, wird das Verzeichnis ``~/.reticulum`` erstellt, 
+und die Standardkonfiguration wird automatisch hier erstellt.
+Sie können sie in eines der anderen Verzeichnisse verschieben, wenn Sie dies wünschen.
+
+Es ist auch möglich, völlig beliebige Konfigurationsverzeichnisse zu verwenden, 
+durch Angabe der entsprechenden Kommandozeilenparameter bei der Ausführung von Reticulum-basierten Programmen. 
+Sie können auch mehrere separate Reticulum-Instanzen auf demselben
+physischen System ausführen, entweder isoliert voneinander oder miteinander verbunden.
+
+In den meisten Fällen läuft auf einem einzelnen physischen System nur eine Reticulum Instanz. 
+Diese kann entweder beim Booten als Systemdienst gestartet werden 
+oder einfach aufgerufen werden, wenn ein Programm es benötigt. 
+In jedem Fall wird für eine beliebige Anzahl von Programmen, die auf demselben System laufen, 
+automatisch dieselbe geteilte Reticulum-Instanz nutzen, wenn die Konfiguration dies zulässt, was standardmäßig der Fall ist.
+
+Die gesamte Konfiguration von Reticulum findet sich in der Datei ``~/.reticulum/config`` . 
+Wenn Reticulum zum ersten Mal auf einem neuen System gestartet wird, wird eine einfache, 
+aber voll funktionsfähige Konfigurationsdatei erstellt. 
+Die Standardkonfiguration sieht wie folgt aus:
+
+.. code::
+
+  # Dies ist die Standardkonfigurationsdatei von Reticulum.
+  # Sie sollten diese wahrscheinlich erweitern, 
+  # um zusätzliche Schnittstellen und Einstellungen aufzunehmen,
+  # die Sie möglicherweise benötigen.
+
+  # Nur die grundlegendsten Optionen sind in dieser Standard Konfiguration enthalten.
+  # Um eine ausführlichere und viel längere Konfiguration zu sehen,
+  # können Sie den Befehl ausführen:
+  # rnsd --exampleconfig
+
+
+  [reticulum]
+
+  # Wenn Sie Transport aktivieren, leitet Ihr System den Verkehr für andere Peers,
+  # gibt Ankündigungen weiter und bedient Trassenanträge.
+  # Dies sollte nur bei Systemen geschehen,
+  # welche geeignet sind um als Transportknoten zu fungieren,
+  # d. h. wenn sie stationär sind und immer eingeschaltet.
+  # Diese Richtlinie ist optional und kann entfernt werden
+  # der Kürze halber.
+
+  enable_transport = False
+
+
+  # Standardmäßig wird das erste Programm, das den Reticulum
+  # Network Stack verwendet, eine gemeinsame Instanz erstellen, die andere
+  # Programme mitverwenden können. Nur die gemeinsame Instanz
+  # öffnet alle konfigurierten Schnittstellen direkt, und andere
+  # lokale Programme kommunizieren mit der gemeinsamen Instanz über
+  # einen lokalen Socket. Dies ist völlig transparent für den Benutzer
+  # und sollte im Allgemeinen aktiviert sein. Diese Richtlinie
+  # ist optional und kann der Kürze halber weggelassen werden.
+
+  share_instance = Yes
+
+
+  # Wenn Sie mehrere *verschiedene* gemeinsame Instanzen auf 
+  # demselben System betreiben wollen, müssen Sie unterschiedliche
+  # gemeinsame Instanz-Ports für jedes angeben. Die Standardwerte sind wie folgt
+  # unten, und auch diese Optionen können weggelassen werden, 
+  # wenn Sie sie nicht brauchen.
+
+  shared_instance_port = 37428
+  instance_control_port = 37429
+
+
+  # Sie können Reticulum so konfigurieren, dass es in Panik gerät und zwangsweise geschlossen wird
+  # wenn ein nicht behebbarer Schnittstellenfehler auftritt, wie zum Beispiel das
+  # Hardware-Gerät für eine Schnittstelle verschwindet. Dies ist
+  # eine optionale Richtlinie und kann der Kürze halber weggelassen werden.
+  # Dieses Verhalten ist standardmäßig deaktiviert.
+
+  panic_on_interface_error = No
+
+
+  [logging]
+  # Gültige Protokollier Stufen sind von 0 bis 7:
+  #   0: Nur kritische Informationen protokollieren
+  #   1: Fehler protokollieren und Protokollstufen senken
+  #   2: Protokollwarnungen und niedrigere Protokollstufen
+  #   3: Log-Hinweise und niedrigere Log-Ebenen
+  #   4: Log info und niedriger (dies ist die Standardeinstellung)
+  #   5: Ausführliche Protokollierung
+  #   6: Fehlersuchprotokollierung
+  #   7: Extreme Protokollierung
+
+  loglevel = 4
+
+
+  # Der Abschnitt Schnittstellen definiert die physischen und virtuellen
+  # Schnittstellen, über die Reticulum kommunizieren wird. Dieser
+  # Abschnitt wird Beispiele für eine Vielzahl von Schnittstellen Typen enthalten.
+  # Sie können diese abändern oder als Grundlage verwenden für
+  # Ihre eigene Konfiguration, oder entfernen Sie einfach die unbenutzten Einträge.
+
+  [interfaces]
+
+    # Diese Schnittstelle ermöglicht die Kommunikation mit anderen
+    # link-lokalen Reticulum-Knoten über UDP. Sie funktioniert so, und sie
+    # brauchen keine funktionierende IP-Infrastruktur wie Router
+    # oder DHCP-Server, sondern erfordert lediglich, dass zumindest Link-
+    # lokales IPv6 in Ihrem Betriebssystem aktiviert ist, das
+    # sollte in fast allen Betriebssystemen standardmäßig aktiviert sein. 
+    # Siehe das Reticulum-Handbuch für weitere Konfigurationsmöglichkeiten.
+
+    [[Default Interface]]
+      type = AutoInterface
+      interface_enabled = True
+
+Wenn die Reticulum-Infrastruktur bereits lokal vorhanden ist, müssen Sie wahrscheinlich nichts ändern, 
+und möglicherweise sind Sie bereits an ein größeres Netzwerk angeschlossen. Falls nicht,
+müssen Sie wahrscheinlich die relevanten *Schnittstellen* zur Konfiguration hinzufügen,
+um mit anderen Systemen kommunizieren zu können. Es ist eine gute Idee, die Kommentare
+und Erklärungen in der obigen Standardkonfiguration zu lesen. Darin lernen Sie die grundlegenden
+Konzepte, die Sie verstehen müssen, um Ihr Netzwerk zu konfigurieren. Sobald Sie das getan haben,
+werfen Sie einen Blick auf das Kapitel :ref:`Interfaces<Interfaces-main>` dieses Handbuchs.
+
+Enthaltene Dienstprogramme
+-------------------------
+
+Reticulum enthält eine Reihe nützlicher Dienstprogramme, sowohl für die Verwaltung Ihrer Reticulum
+Netzwerke als auch für die Ausführung gängiger Aufgaben über Reticulum-Netzwerke, wie z. B.
+die Übertragung von Dateien auf entfernte Systeme und die Ausführung von Befehlen und Programmen aus der Ferne.
+
+Wenn Sie Reticulum häufig von verschiedenen Programmen aus verwenden oder einfach nur möchten, 
+dass Reticulum ständig verfügbar sein soll, z. B. wenn Sie einen Transportknoten hosten,
+sollten Sie Reticulum als separaten Dienst ausführen, 
+den andere Programme, Anwendungen und Dienste nutzen können.
+
+Das rnsd Dienstprogramm
+================
+
+Es ist sehr einfach, Reticulum als Dienst laufen zu lassen. Führen Sie einfach den mitgelieferten Befehl ``rnsd`` aus.
+Wenn ``rnsd`` läuft, hält es alle konfigurierten Schnittstellen offen, behandelt den Transport, 
+wenn aktiviert ist, und erlaubt allen anderen Programmen die sofortige Nutzung des
+Reticulum-Netzwerks, für das es konfiguriert ist.
+
+Sie können sogar mehrere Instanzen von rnsd mit unterschiedlichen Konfigurationen auf
+demselben System laufen lassen.
+
+.. code:: text
+
+  # Install Reticulum
+  pip3 install rns
+
+  # Run rnsd
+  rnsd
+
+.. code:: text
+
+  usage: rnsd [-h] [--config CONFIG] [-v] [-q] [--version]
+
+  Reticulum Network Stack Daemon
+
+  optionale Argumente:
+    -h, --help       diese Hilfemeldung anzeigen und beenden
+    --config CONFIG  Pfad zum alternativen Reticulum-Konfigurationsverzeichnis
+    -v, --verbose
+    -q, --quiet
+    --version        Versionsnummer des Programms anzeigen und beenden
+
+Sie können ``rnsd`` ganz einfach als immer aktiven Dienst hinzufügen, indem Sie einen Dienst erstellen, 
+sehen Sie sich dazu :ref:`Konfiguration eines Dienstes<using-systemd>` an.
+
+Das rnstatus Dienstprogramm
+====================
+
+Mit dem Dienstprogramm ``rnstatus`` können Sie den Status der konfigurierten Reticulum
+Schnittstellen anzeigen, ähnlich wie das Programm ``ifconfig``.
+
+.. code:: text
+
+  # Run rnstatus
+  rnstatus
+
+  # Beispiel einer Ausgabe
+  Shared Instance[37428]
+     Status  : Up
+     Serving : 1 program
+     Rate    : 1.00 Gbps
+     Traffic : 83.13 KB↑
+               86.10 KB↓
+
+  AutoInterface[Local]
+     Status  : Up
+     Mode    : Full
+     Rate    : 10.00 Mbps
+     Peers   : 1 reachable
+     Traffic : 63.23 KB↑
+               80.17 KB↓
+
+  TCPInterface[RNS Testnet Frankfurt/frankfurt.rns.unsigned.io:4965]
+     Status  : Up
+     Mode    : Full
+     Rate    : 10.00 Mbps
+     Traffic : 187.27 KB↑
+               74.17 KB↓
+
+  RNodeInterface[RNode UHF]
+     Status  : Up
+     Mode    : Access Point
+     Rate    : 1.30 kbps
+     Access  : 64-bit IFAC by <…e702c42ba8>
+     Traffic : 8.49 KB↑
+               9.23 KB↓
+
+  Reticulum Transport Instance <5245a8efe1788c6a1cd36144a270e13b> running
+
+.. code:: text
+
+  usage: rnstatus [-h] [--config CONFIG] [--version] [-a] [-v]
+
+  Reticulum Network Stack Status
+
+  optionale Argumente:
+    -h, --help       diese Hilfemeldung anzeigen und beenden
+    --config CONFIG  Pfad zum alternativen Reticulum-Konfigurationsverzeichnis
+    --version        Versionsnummer des Programms anzeigen und beenden
+    -a, --all        alle Schnittstellen anzeigen
+    -v, --verbose
+
+
+Das rnpath Dienstprogramm
+====================
+
+Mit dem Dienstprogramm ``rnpath`` können Sie die Pfade für Ziele im Reticulum-Netzwerk anzeigen.
+
+.. code:: text
+
+  # Run rnpath
+  rnpath c89b4da064bf66d280f0e4d8abfd9806
+
+  # Beispiel einer Ausgabe
+  Path found, destination <c89b4da064bf66d280f0e4d8abfd9806> is 4 hops away via <f53a1c4278e0726bb73fcc623d6ce763> on TCPInterface[Testnet/frankfurt.connect.reticulu.network:4965]
+
+.. code:: text
+
+  usage: rnpath [-h] [--config CONFIG] [--version] [-t] [-r] [-d] [-D] [-w seconds] [-v] [destination]
+  
+  Reticulum Path Discovery Utility
+  
+  Positionsbezogene Argumente:
+    destination           hexadezimaler Hash der Zieldestination
+  
+  optionale Argumente:
+    -h, --help            diese Hilfemeldung anzeigen und beenden
+    --config CONFIG       Pfad zum alternativen Reticulum-Konfigurationsverzeichnis
+    --version             Versionsnummer des Programms anzeigen und beenden
+    -t, --table           alle bekannten Pfade anzeigen
+    -r, --rates           zeige Ankündigungs Raten Infos an
+    -d, --drop            remove the path to a destination
+    -D, --drop-announces  alle in der Warteschlange stehenden Ankündigungen verwerfen
+    -w seconds            Zeitüberschreitung vor dem Aufgeben
+    -v, --verbose
+
+
+Das rnprobe Dienstprogramm
+====================
+
+Das Dienstprogramm ``rnprobe`` erlaubt es, ein Ziel auf Konnektivität zu prüfen, ähnlich wie
+ähnlich wie das Programm ``ping``. Bitte beachten Sie, dass Probes nur beantwortet werden, wenn das
+angegebene Ziel so konfiguriert ist, dass es Proofs für empfangene Pakete sendet. Viele
+Ziele haben diese Option nicht aktiviert und sind daher nicht wahrscheinlich.
+
+.. code:: text
+
+  # Run rnprobe
+  rnprobe example_utilities.echo.request 2d03725b327348980d570f739a3a5708
+
+  # Beispiel einer Ausgabe
+  Sent 16 byte probe to <2d03725b327348980d570f739a3a5708>
+  Valid reply received from <2d03725b327348980d570f739a3a5708>
+  Round-trip time is 38.469 milliseconds over 2 hops
+
+.. code:: text
+
+  usage: rnprobe [-h] [--config CONFIG] [--version] [-v] [full_name] [destination_hash]
+
+  Reticulum Probe Utility
+
+  Positionsbezogene Argumente:
+    full_name         vollständiger Name des Ziels in punktierter Notation
+    destination_hash  hexadecimal hash des Bestimmungsortes
+
+  optionale Argumente:
+    -h, --help        diese Hilfemeldung anzeigen und beenden
+    --config CONFIG   Pfad zum alternativen Reticulum-Konfigurationsverzeichnis
+    --version         Versionsnummer des Programms anzeigen und beenden
+    -v, --verbose
+
+
+Das rncp Dienstprogramm
+================
+
+Das Dienstprogramm ``rncp`` ist ein einfaches Werkzeug zur Dateiübertragung. 
+Mit ihm können Sie Dateien durch Reticulum übertragen.
+
+.. code:: text
+
+  # Führen Sie rncp auf dem empfangenden System aus und geben Sie an, welche Identitäten
+  # berechtigt sind Dateien zu senden
+  rncp --receive -a 1726dbad538775b5bf9b0ea25a4079c8 -a c50cc4e4f7838b6c31f60ab9032cbc62
+
+  # Von einem anderen System, kopieren einer Datei auf das Empfangssystem
+  rncp ~/path/to/file.tgz 73cbd378bb0286ed11a707c13447bb1e
+
+Sie können so viele zugelassene Absender wie nötig angeben oder die Authentifizierung vollständig deaktivieren.
+
+.. code:: text
+
+  usage: rncp [-h] [--config path] [-v] [-q] [-p] [-r] [-b] [-a allowed_hash] [-n] [-w seconds] [--version] [file] [destination]
+
+  Reticulum File Transfer Utility
+
+  Positionsbezogene Argumente:
+    file                  zu übertragende Datei
+    destination           hexadecimal hash des Empfängers
+
+  optionale Argumente:
+    -h, --help            diese Hilfemeldung anzeigen und beenden
+    --config path         Pfad zum alternativen Reticulum-Konfigurationsverzeichnis
+    -v, --verbose         Ausführlichkeit erhöhen
+    -q, --quiet           die Ausführlichkeit verringern
+    -p, --print-identity  Identität und Zielinformation drucken und beenden
+    -r, --receive         Warten auf eingehende Dateien
+    -b, --no-announce     bei Programmstart nicht ankündigen
+    -a allowed_hash       von dieser Identität akzeptieren
+    -n, --no-auth         Dateien von jedem akzeptieren
+    -w seconds            Zeitüberschreitung des Absenders vor dem Aufgeben
+    --version             Versionsnummer des Programms anzeigen und beenden
+    -v, --verbose
+
+
+Das rnx Dienstprogramm
+================
+
+Das Dienstprogramm ``rnx`` ist ein einfaches Programm zur Ausführung entfernter Befehle. 
+Es erlaubt Ihnen Befehle auf entfernten Systemen über Reticulum auszuführen 
+und die zurückgegebenen Befehlsausgabe anzusehen.
+
+.. code:: text
+
+  # Führen Sie rnx auf dem Abhörsystem aus und geben Sie an, welche Identitäten
+  # berechtigt sind, Befehle auszuführen
+  rncp --listen -a 941bed5e228775e5a8079fc38b1ccf3f -a 1b03013c25f1c2ca068a4f080b844a10
+
+  # Führen Sie von einem anderen System den Befehl aus
+  rnx 7a55144adf826958a9529a3bcf08b149 "cat /proc/cpuinfo"
+
+  # Oder geben Sie die Pseudo-Shell für den interaktiven Modus ein
+  rnx 7a55144adf826958a9529a3bcf08b149 -x
+
+  # Die Standard-Identitätsdatei ist gespeichert in
+  # ~/.reticulum/identities/rnx, aber Sie können auch
+  # eine andere benutzen, die erstellt wird, wenn sie
+  # nicht bereits vorhanden ist
+  rnx 7a55144adf826958a9529a3bcf08b149 -i /path/to/identity -x
+
+Sie können so viele zugelassene Absender angeben, wie Sie benötigen, oder die Authentifizierung komplett deaktivieren.
+
+.. code:: text
+
+  usage: rnx [-h] [--config path] [-v] [-q] [-p] [-l] [-i identity] [-x] [-b] [-a allowed_hash] [-n] [-N] [-d] [-m] [-w seconds] [-W seconds] [--stdin STDIN] [--stdout STDOUT] [--stderr STDERR] [--version]
+             [destination] [command]
+
+  Reticulum Remote Execution Utility
+
+  Positionsbezogene Argumente:
+    destination           hexadecimal hash des Zuhörers
+    command               auszuführender Befehl
+
+  optionale Argumente:
+    -h, --help            diese Hilfemeldung anzeigen und beenden
+    --config path         Pfad zum alternativen Reticulum-Konfigurationsverzeichnis
+    -v, --verbose         Ausführlichkeit erhöhen
+    -q, --quiet           die Ausführlichkeit verringern
+    -p, --print-identity  Identität und Zielinformation drucken und beenden
+    -l, --listen          auf eingehende Befehle warten
+    -i identity           Pfad zur zu verwendenden Identität
+    -x, --interactive     in den interaktiven Modus wechseln
+    -b, --no-announce     bei Programmstart nicht ankündigen
+    -a allowed_hash       von dieser Identität annehmen
+    -n, --noauth          Dateien von jedem akzeptieren
+    -N, --noid            sich nicht mit dem Hörer identifizieren
+    -d, --detailed        detaillierte Ergebnisausgabe anzeigen
+    -m                    Mirror-Exit-Code des Remote-Befehls
+    -w seconds            Verbindung herstellen und Timeout anfordern, bevor er aufgibt
+    -W seconds            maximale Zeit für das Herunterladen der Ergebnisse
+    --stdin STDIN         Eingabe an stdin übergeben
+    --stdout STDOUT       maximale Größe des zurückgegebenen stdout in Bytes
+    --stderr STDERR       maximale Größe des zurückgegebenen stderr in Bytes
+    --version             Versionsnummer des Programms anzeigen und beenden
+
+
+Verbesserung der Systemkonfiguration
+------------------------------
+
+Wenn Sie ein System für die dauerhafte Verwendung mit Reticulum einrichten, 
+gibt es ein paar Änderungen an der Systemkonfiguration, die die Verwaltung erleichtern können.
+Diese Änderungen werden hier detailliert beschrieben.
+
+
+Feste Namen für serielle Anschlüsse
+=======================
+
+Bei einer Reticulum-Instanz mit mehreren seriellen Schnittstellen kann es von Vorteil sein,
+die festen Gerätenamen für die seriellen Schnittstellen zu verwenden, 
+anstelle der dynamisch zugewiesenen Kurzbezeichnungen wie ``/dev/ttyUSB0``. 
+Unter den meisten Debian-basierten Distributionen, einschließlich Ubuntu und Raspberry Pi OS, 
+können diese Knoten unter ``/dev/serial/by-id`` gefunden werden.
+
+Sie können einen solchen Gerätepfad direkt anstelle der nummerierten Kurzbezeichnungen verwenden.
+Hier ist ein Beispiel für einen so konfigurierten Packet Radio TNC:
+
+.. code:: text
+
+  [[Packet Radio KISS Interface]]
+    type = KISSInterface
+    interface_enabled = True
+    outgoing = true
+    port = /dev/serial/by-id/usb-FTDI_FT230X_Basic_UART_43891CKM-if00-port0
+    speed = 115200    
+    databits = 8
+    parity = none
+    stopbits = 1
+    preamble = 150
+    txtail = 10
+    persistence = 200
+    slottime = 20
+
+Mit dieser Methodik werden potenzielle Namensverwechslungen vermieden, 
+wenn physische Geräte in unterschiedlicher Reihenfolge ein- und ausgesteckt werden, 
+oder wenn die Zuordnung von einem Boot zum anderen variiert.
+
+.. _using-systemd:
+
+Reticulum als Systemdienst
+=============================
+
+Anstatt Reticulum manuell zu starten, können Sie ``rnsd`` als Systemdienst installieren
+und es automatisch beim Booten starten lassen.
+
+Wenn Sie Reticulum mit ``pip`` installiert haben, wird das Programm ``rnsd`` höchstwahrscheinlich
+nur in einem benutzerlokalen Installationspfad zu finden sein, was bedeutet, 
+dass ``systemd`` nicht in der Lage ist, es auszuführen. 
+In diesem Fall können Sie das ``rnsd``-Programm einfach per Symlink in ein Verzeichnis kopieren, das sich im Pfad von systemd befindet:
+
+.. code:: text
+
+  sudo ln -s $(which rnsd) /usr/local/bin/
+
+Sie können dann die Dienstdatei ``/etc/systemd/system/rnsd.service`` mit folgendem Inhalt erstellen:
+
+.. code:: text
+
+  [Unit]
+  Description=Reticulum Network Stack Daemon
+  After=multi-user.target
+
+  [Service]
+  # Wenn Sie Reticulum auf WiFi-Geräten betreiben,
+  # oder anderen Geräte, die etwas mehr Zeit 
+  # für die Initialisierung benötigen, 
+  # können Sie eine kurze Verzögerung einfügen, 
+  # bevor Reticulum startet durch systemd:
+  # ExecStartPre=/bin/sleep 10
+  Type=simple
+  Restart=always
+  RestartSec=3
+  User=BENUTZERNAMEHIER
+  ExecStart=rnsd --service
+
+  [Install]
+  WantedBy=multi-user.target
+
+Ändern Sie das ``BENUTZERNAMEHIER`` zu dem Benutzer, unter dem Sie ``rnsd`` ausführen wollen.
+
+Um ``rnsd`` manuell zu starten, führen Sie aus:
+
+.. code:: text
+
+  sudo systemctl start rnsd
+
+Wenn Sie ``rnsd`` automatisch beim Booten starten wollen, führen Sie aus:
+
+.. code:: text
+
+  sudo systemctl enable rnsd

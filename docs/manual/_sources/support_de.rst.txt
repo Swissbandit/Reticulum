@@ -1,0 +1,42 @@
+.. _support-main:
+
+*****************
+Reticulum unterstützen
+*****************
+Sie können die weitere Entwicklung von offenen, freien und privaten Kommunikationssystemen unterstützen,
+indem Sie spenden, Feedback geben und Code und Lernressourcen beisteuern.
+
+Spenden
+=========
+Spenden werden über die folgenden Kanäle dankbar entgegengenommen:
+
+
+.. code:: text
+
+    Monero:
+    84FpY1QbxHcgdseePYNmhTHcrgMX4nFfBYtz2GKYToqHVVhJp8Eaw1Z1EedRnKD19b3B8NiLCGVxzKV17UMmmeEsCrPyA5w
+
+    Ethereum:
+    0x81F7B979fEa6134bA9FD5c701b3501A2e61E897a
+
+    Bitcoin:
+    3CPmacGm34qYvR6XWLVEJmi2aNe3PZqUuq
+
+    Ko-Fi:
+    https://ko-fi.com/markqvist
+
+Sind bestimmte Funktionen in der Entwicklungs-Roadmap für Sie, Ihre Organisation oder Ihr Unternehmen wichtig?
+Machen Sie sie schnell zur Realität, indem Sie ihre Umsetzung sponsern.
+
+Feedback geben
+================
+Alle Rückmeldungen über die Nutzung, das Funktionieren und mögliche Fehlfunktionen aller
+Komponenten des Systems ist sehr wertvoll für die weitere Entwicklung und
+Verbesserung von Reticulum. Automatische Analysen, Telemetrie, Fehlerberichte
+oder Statistiken werden von Reticulum unter keinen Umständen gesammelt 
+und Daher verlassen wir uns auf das altmodische menschliche Feedback.
+
+Code beisteuern
+===============
+Treten Sie dem GitHub-Repository <https://github.com/markqvist/reticulum>`_ bei, um
+Probleme zu melden, Funktionen vorzuschlagen und Code zu Reticulum beizutragen.
